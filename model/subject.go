@@ -24,4 +24,5 @@ type Subject struct {
 	gradingMethod	  string
 	courceRequirement string
 	reference	  string
+	subpageIds	  []int64
 }
