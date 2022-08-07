@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 127.0.0.1:${PORT}:${PORT}
+    environment:
+      TZ: Asia/Tokyo
+      PORT: ${PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ADDR: ${MYSQL_ADDR}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      DEFAULT_REGION_NAME: ${DEFAULT_REGION_NAME}
+      APP_ENV: ${APP_ENV}
