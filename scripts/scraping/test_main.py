@@ -7,7 +7,6 @@ from yasu_bs import *
 
 
 class Test(unittest.TestCase):
-    bs = None
 
     def setUpClass():
         url = "https://ocw.kyoto-u.ac.jp/course/68/"
@@ -27,7 +26,7 @@ class Test(unittest.TestCase):
 
     def test_academic_year(self):
         academic_year = Test.page.get_academic_year()
-        self.assertEqual("2018", academic_year)
+        self.assertEqual(2018, academic_year)
 
     def test_semester(self):
         semester = Test.page.get_semester()

@@ -67,26 +67,57 @@ type Faculty struct {
 	rank			 string
 }
 """
-
-
 class Page:
     url = None
-    bs = None
+    soup = None
 
     def __init__(self, url: str):
         self.url = url
-        self.bs = BeautifulSoup(requests.get(url).text, "html.parser")
+        self.soup = BeautifulSoup(requests.get(url).text, "html.parser")
 
     # for subject struct
     def get_subject_title(self) -> str:
-        return self.bs.select(".c-title__content")[0].text
+        # select class with "c-title__content"
+        return self.soup.find('h2', class_='c-title__content').text
+        
 
+    # find a tag with text "開講部局名" and select the next tag
     def get_department(self) -> str:
-        return self.bs.select(".courses__detail--detail dl:nth-child(2) dd")[0].text
+        return self.soup.find('dt', string='開講部局名').find_next('dd').text
 
     def get_language(self) -> str:
-        return self.bs.select(".courses__detail--detail dl:nth-child(3) dd")[0].text
+        return self.soup.find('dt', string='使用言語').find_next('dd').text
+    
+    def get_academic_year(self) -> int:
+        year_regex = re.compile(r'^\d{4}')
+        try:
+            year = self.soup.find('th', string='開講年度・開講期').find_next('td').text
+        except AttributeError:
+            try:
+                year = self.soup.find('th', string='年度').find_next('td').text
+            except AttributeError:
+                year = self.soup.find('th', string='年度・期').find_next('td').text
+        
+        matched_year = year_regex.match(year)
+        
+        return int(matched_year.group())
 
+    def get_semester(self) -> str:
+        try:
+            year = self.soup.find('th', string='開講年度・開講期').find_next('td').text
+        except AttributeError:
+            year = self.soup.find('th', string='開講期').find_next('td').text
+
+        # regex for 前期 or 後期
+        semester_regex = re.compile(r'(前期|後期)')
+        matched_semester = semester_regex.match(year)
+        return matched_semester.group()
+
+    def get_targeted_audience(self) -> str:
+        self.soup.find('th', string='対象学生').find_next('td').text
+
+    def get_subject_outline(self) -> str:
+        return self.soup.find('th', string='授業の概要・目的').find_next('div').text
 
 subject_dict = {
     "id": 0,
@@ -148,14 +179,7 @@ video_dict = {
 }
 
 
-def get_subject_title(text: str) -> str:
-    title_pattern = r"###.*?\n(.*?)\n###"
-    title_result = re.search(title_pattern, text)
 
-    if title_result is None:
-        raise Exception("Failed to extract title from text")
-
-    return title_result.group(1)
 
 
 def fetch_body(url: str) -> str:
