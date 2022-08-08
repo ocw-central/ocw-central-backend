@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "poetry_env"
+version = "0.1.0"
+description = ""
+authors = ["Yasutaka Odo <yasutakaodo@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fire = "^0.4.0"
+httpx = "^0.23.0"
+requests = "^2.28.1"
+bs4 = "^0.0.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
