@@ -10,12 +10,12 @@ type VideoId struct {
 }
 
 type Video struct {
-	id				 VideoId `desc:"ID"`
-	title			 string `desc:"タイトル"`
-	link			 string `desc:"リンク"`
-	chapters		 []*Chapter `desc:"チャプターs"`
-	facultyIds		 []int64 `desc:"FacultyIds"`
-	lecturedOn time.Time `desc:"講義日"`
+	id          VideoId       `desc:"ID"`
+	title       string        `desc:"タイトル"`
+	link        string        `desc:"リンク"`
+	chapters    []*Chapter    `desc:"チャプターs"`
+	facultyIds  []int64       `desc:"FacultyIds"`
+	lecturedOn  time.Time     `desc:"講義日"`
 	videoLength time.Duration `desc:"動画の長さ"`
-	Language		 string `desc:"使用言語"`
+	Language    string        `desc:"使用言語"`
 }

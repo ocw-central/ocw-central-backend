@@ -9,6 +9,6 @@ type SubpageId struct {
 }
 
 type Subpage struct {
-	id				 SubpageId `desc:"ID"`
-	content			 string `desc:"内容テキスト"`
+	id      SubpageId `desc:"ID"`
+	content string    `desc:"内容テキスト"`
 }

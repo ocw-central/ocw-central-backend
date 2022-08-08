@@ -9,6 +9,6 @@ type PdfId struct {
 }
 
 type Pdf struct {
-	id				 PdfId `desc:"ID"`
-	link			 string `desc:"PDFリンク"`
+	id   PdfId  `desc:"ID"`
+	link string `desc:"PDFリンク"`
 }
