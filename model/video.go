@@ -14,7 +14,7 @@ type Video struct {
 	title       string        `desc:"タイトル"`
 	link        string        `desc:"リンク"`
 	chapters    []*Chapter    `desc:"チャプターs"`
-	facultyIds  []int64       `desc:"FacultyIds"`
+	facultyIds  []*Faculty    `desc:"FacultyIds"`
 	lecturedOn  time.Time     `desc:"講義日"`
 	videoLength time.Duration `desc:"動画の長さ"`
 	Language    string        `desc:"使用言語"`
