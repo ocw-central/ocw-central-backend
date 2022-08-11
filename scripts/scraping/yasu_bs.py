@@ -80,7 +80,6 @@ class Page:
         # select class with "c-title__content"
         return self.soup.find('h2', class_='c-title__content').text
         
-
     # find a tag with text "開講部局名" and select the next tag
     def get_department(self) -> str:
         return self.soup.find('dt', string='開講部局名').find_next('dd').text
@@ -110,14 +109,17 @@ class Page:
 
         # regex for 前期 or 後期
         semester_regex = re.compile(r'(前期|後期)')
-        matched_semester = semester_regex.match(year)
+        matched_semester = semester_regex.search(year)
         return matched_semester.group()
 
     def get_targeted_audience(self) -> str:
-        self.soup.find('th', string='対象学生').find_next('td').text
+        return self.soup.find('th', string='対象学生').find_next('td').text
 
     def get_subject_outline(self) -> str:
-        return self.soup.find('th', string='授業の概要・目的').find_next('div').text
+        
+        text = self.soup.find('th', string='授業の概要・目的').find_next('div').text
+        # remove all special characters and spaces from text
+        return re.sub(r'[^\w]', '', text)
 
 subject_dict = {
     "id": 0,
@@ -177,9 +179,6 @@ video_dict = {
     "videoLength": "",
     "Language": "",
 }
-
-
-
 
 
 def fetch_body(url: str) -> str:
