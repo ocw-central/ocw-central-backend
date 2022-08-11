@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/oklog/ulid"
 	"time"
+
+	"github.com/oklog/ulid"
 )
 
 type VideoId struct {
@@ -13,9 +14,9 @@ type Video struct {
 	id          VideoId       `desc:"ID"`
 	title       string        `desc:"タイトル"`
 	link        string        `desc:"リンク"`
-	chapters    []*Chapter    `desc:"チャプターs"`
-	facultyIds  []*Faculty    `desc:"FacultyIds"`
+	chapters    []Chapter     `desc:"チャプターs"`
+	facultyIds  []FacultyId   `desc:"FacultyIds"`
 	lecturedOn  time.Time     `desc:"講義日"`
 	videoLength time.Duration `desc:"動画の長さ"`
-	Language    string        `desc:"使用言語"`
+	language    string        `desc:"使用言語"`
 }
