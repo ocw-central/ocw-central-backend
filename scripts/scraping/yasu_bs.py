@@ -8,65 +8,81 @@ import httpx
 import requests
 from bs4 import BeautifulSoup
 
-""""
-type Subject struct {
-	id				 int64 
-	category		 string 
-	title			 string 
-	facultyIds		 []int64
-	videoIds		 []int64
-	location		 string
-	remark 			 string
-	pdfLinks		 []string
-	relatedSubjectIds []int64
-	department       string
-	language         string
-	academicYear     string
-	semester         string
-	firstHeldOn      string
-	numCredit       int8
-	courceFormat     string
-	targetedAudience string
-	dayOfWeek        string
-	courcePeriod     string
-	outline		  string
-	objective	  string
-	lessonPlan	  string
-	gradingMethod	  string
-	courceRequirement string
-	reference	  string
-	subpageIds	  []int64
+# define python dictionaries for each go struct
+
+dic_subject = {
+    "id": "",
+    "category": "",
+    "title": "",
+    "videoIds": [],
+    "location": "",
+    "pdfIds": [],
+    "relatedSubjectIds": [],
+    "department": "",
+    "firstHeldOn": "",
+    "facultyIds": [],
+    "language": "",
+    "freeDescription": "",
+    "syllabusId": "",
+    "series": "",
 }
 
-type Chapter struct {
-	start_at time.Time
-	topic	string
-	thumbnail string
+dic_video = {
+    "id": "",
+    "title": "",
+    "link": "",
+    "chapters": [],
+    "facultyIds": [],
+    "lecturedOn": "",
+    "videoLength": "",
+    "langugage": "",
 }
 
-type subpage struct {
-	id				 int64
-	content			 string
+dic_pdf = {
+    "id": "",
+    "title": "",
+    "description": "",
+    "url": "",
 }
 
-type Video struct {
-	id				 int64
-	title			 string
-	link			 string
-	chapters		 []*Chapter
-	facultyIds		 []int64
-	lecturedOn time.Time
-	videoLength time.Duration
-	Language		 string
+# convert the following struct to python
+dic_syllabus = {
+    "id": "",
+    "language": "",
+    "subjectNumbering": "",
+    "academicYear": "",
+    "semester": "",
+    "numCredit": "",
+    "courseFormat": "",
+    "assignmenedGrade": "",
+    "targettedAudience": "",
+    "dayOfWeek": "",
+    "coursePeriod": "",
+    "outline": "",
+    "objective": "",
+    "lessonPlan": "",
+    "gradingMethod": "",
+    "courseRequirement": "",
+    "outClassLearning": "",
+    "outClassLearnig": "",
+    "reference": "",
+    "reference": "",
+    "remark": "",
+    "subpageIds": [],
 }
 
-type Faculty struct {
-	id				 int64
-	name			 string
-	department		 string
-	rank			 string
+dic_faculty = {
+    "id": "",
+    "name": "",
+    "department": "",
+    "rank": ""
 }
-"""
+
+dic_subpage = {
+    "id": "",
+    "content": ""
+}
+
 class Page:
     url = None
     soup = None
@@ -120,66 +136,6 @@ class Page:
         text = self.soup.find('th', string='授業の概要・目的').find_next('div').text
         # remove all special characters and spaces from text
         return re.sub(r'[^\w]', '', text)
-
-subject_dict = {
-    "id": 0,
-    "category": "",
-    "title": "",
-    "facultyIds": [],
-    "videoIds": [],
-    "location": "",
-    "remark": "",
-    "pdfLinks": [],
-    "relatedSubjectIds": [],
-    "department": "",
-    "language": "",
-    "academicYear": "",
-    "semester": "",
-    "firstHeldOn": "",
-    "numCredit": 0,
-    "courceFormat": "",
-    "targetedAudience": "",
-    "dayOfWeek": "",
-    "courcePeriod": "",
-    "outline": "",
-    "objective": "",
-    "lessonPlan": "",
-    "gradingMethod": "",
-    "courceRequirement": "",
-    "reference": "",
-    "subpageIds": [],
-}
-
-faculty_dict = {
-    "id": 0,
-    "name": "",
-    "department": "",
-    "rank": "",
-}
-
-
-chapter_dict = {
-    "start_at": "",
-    "topic": "",
-    "thumbnail": "",
-}
-
-subpage_dict = {
-    "id": 0,
-    "content": "",
-}
-
-video_dict = {
-    "id": 0,
-    "title": "",
-    "link": "",
-    "chapters": [],
-    "facultyIds": [],
-    "lecturedOn": "",
-    "videoLength": "",
-    "Language": "",
-}
-
 
 def fetch_body(url: str) -> str:
     res = httpx.get(url)
