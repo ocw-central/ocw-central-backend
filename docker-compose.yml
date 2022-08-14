@@ -16,3 +16,14 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       DEFAULT_REGION_NAME: ${DEFAULT_REGION_NAME}
       APP_ENV: ${APP_ENV}
+  db:
+    image: mysql:8.0.30
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
