@@ -3,27 +3,49 @@ version: "3.7"
 services:
   server:
     build:
-      context: .
+      context: ./docker/server
       dockerfile: Dockerfile
+    depends_on:
+      - db
+      - migrate
     ports:
-      - 127.0.0.1:${PORT}:${PORT}
+      - ${SERVER_HOST_HOST}:${SERVER_HOST_PORT}:${SERVER_CONTAINER_PORT}
+    volumes:
+      - ./docker/server:/var/lib/server
     environment:
-      TZ: Asia/Tokyo
-      PORT: ${PORT}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ADDR: ${MYSQL_ADDR}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      DEFAULT_REGION_NAME: ${DEFAULT_REGION_NAME}
-      APP_ENV: ${APP_ENV}
+      TZ: ${SERVER_CONTAINER_TZ}
+      PORT: ${SERVER_CONTAINER_PORT}
+      MYSQL_USER: ${MYSQL_CONTAINER_USER}
+      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_ADDR: ${MYSQL_CONTAINER_HOST}:${MYSQL_CONTAINER_PORT}
+      MYSQL_DATABASE: ${MYSQL_CONTAINER_DATABASE}
+      DEFAULT_REGION_NAME: ${SERVER_CONTAINER_DEFAULT_REGION_NAME}
+      APP_ENV: ${SERVER_CONTAINER_APP_ENV}
+  migrate:
+    build:
+      context: ./docker/migrate
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    command: ["up"]
+    environment:
+      WAIT_HOSTS: ${MYSQL_CONTAINER_HOST}:${MYSQL_CONTAINER_PORT}
+      MIGRATIONS_DIR: /migrations
+      MYSQL_HOST: ${MYSQL_CONTAINER_HOST}
+      MYSQL_PORT: ${MYSQL_CONTAINER_PORT}
+      MYSQL_DATABASE:  ${MYSQL_CONTAINER_DATABASE}
+      MYSQL_USER: ${MYSQL_CONTAINER_USER}
+      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+    volumes:
+      - ./migrations:/migrations
   db:
     image: mysql:8.0.30
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
-      - "3306:3306"
+      - ${MYSQL_HOST_PORT}:${MYSQL_CONTAINER_PORT}
     volumes:
       - ./docker/mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_CONTAINER_ALLOW_EMPTY_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_CONTAINER_DATABASE}
