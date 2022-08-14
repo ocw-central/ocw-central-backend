@@ -8,24 +8,9 @@ import httpx
 import requests
 from bs4 import BeautifulSoup
 
-# define python dictionaries for each go struct
+import ulid
 
-dic_subject = {
-    "id": "",
-    "category": "",
-    "title": "",
-    "videoIds": [],
-    "location": "",
-    "pdfIds": [],
-    "relatedSubjectIds": [],
-    "department": "",
-    "firstHeldOn": "",
-    "facultyIds": [],
-    "language": "",
-    "freeDescription": "",
-    "syllabusId": "",
-    "series": "",
-}
+# define python dictionaries for each go struct
 
 dic_video = {
     "id": "",
@@ -83,10 +68,28 @@ dic_subpage = {
     "content": ""
 }
 
-class Page:
-    url = None
-    soup = None
+def get_subject_attributes(subject_url: str) -> dict:
 
+
+    dic_subject = {
+        "id": "",
+        "category": "",
+        "title": "",
+        "videoIds": [],
+        "location": "",
+        "pdfIds": [],
+        "relatedSubjectIds": [],
+        "department": "",
+        "firstHeldOn": "",
+        "facultyIds": [],
+        "language": "",
+        "freeDescription": "",
+        "syllabusId": "",
+        "series": "",
+    }
+
+
+class Subject():
     def __init__(self, url: str):
         self.url = url
         self.soup = BeautifulSoup(requests.get(url).text, "html.parser")
@@ -95,7 +98,21 @@ class Page:
     def get_subject_title(self) -> str:
         # select class with "c-title__content"
         return self.soup.find('h2', class_='c-title__content').text
-        
+
+class Video():
+    def __init__(self, url: str):
+        self.url = url
+    
+
+
+class Syllabus():
+    url = None
+    soup = None
+
+    def __init__(self, url: str):
+        self.url = url
+        self.soup = BeautifulSoup(requests.get(url).text, "html.parser")
+
     # find a tag with text "開講部局名" and select the next tag
     def get_department(self) -> str:
         return self.soup.find('dt', string='開講部局名').find_next('dd').text
@@ -136,39 +153,6 @@ class Page:
         text = self.soup.find('th', string='授業の概要・目的').find_next('div').text
         # remove all special characters and spaces from text
         return re.sub(r'[^\w]', '', text)
-
-def fetch_body(url: str) -> str:
-    res = httpx.get(url)
-    soup = BeautifulSoup(res.text, "html.parser")
-    data = soup.select_one("#__NEXT_DATA__").get_text()
-    print(data)
-    return json.loads(data)["props"]["pageProps"]["tasks"]["body"]
-
-
-def download_images_and_replace_links(text: str, question_number) -> str:
-    soup = BeautifulSoup(text, "html.parser")
-    dir_name = f"questions/{str(question_number)}"
-    # crate image folder
-    os.makedirs(f"{os.path.dirname(__file__)}/../../{dir_name}/images", exist_ok=True)
-    regex = r"(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])"
-    all_links = re.findall(regex, text)
-    print(all_links)
-    # filter out links that does not include png file
-    all_png_links = [link for link in all_links if link[1].endswith(".png")]
-    # download images from links
-    for link in all_png_links:
-        # download png file with requests
-        # TODO: check if this line can download image with requests
-        r = requests.get(link[0] + "://" + link[1] + link[2])
-        with open(f"{os.path.dirname(__file__)}/../../{dir_name}/images/{link[1]}", "wb") as f:
-            f.write(r.content)
-        # replace link with local path
-        text = text.replace(link[0] + "://" + link[1] + link[2], f"/{dir_name}/images/{link[1]}")
-    return text
-
-    # get all patterns
-
-    return soup.prettify()
 
 
 if __name__ == "__main__":
