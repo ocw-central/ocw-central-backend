@@ -3,36 +3,35 @@ version: "3.7"
 services:
   server:
     build:
-      context: ./docker/server
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./docker/server/Dockerfile
     depends_on:
       - db
       - migrate
     ports:
-      - ${SERVER_HOST_HOST}:${SERVER_HOST_PORT}:${SERVER_CONTAINER_PORT}
+      - ${SERVER_HOST_HOST}:${SERVER_HOST_PORT}:8080
     volumes:
       - ./docker/server:/var/lib/server
     environment:
       TZ: ${SERVER_CONTAINER_TZ}
-      PORT: ${SERVER_CONTAINER_PORT}
+      PORT: 8080
+      MYSQL_ADDR: db:3306
       MYSQL_USER: ${MYSQL_CONTAINER_USER}
       MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
-      MYSQL_ADDR: ${MYSQL_CONTAINER_HOST}:${MYSQL_CONTAINER_PORT}
       MYSQL_DATABASE: ${MYSQL_CONTAINER_DATABASE}
-      DEFAULT_REGION_NAME: ${SERVER_CONTAINER_DEFAULT_REGION_NAME}
       APP_ENV: ${SERVER_CONTAINER_APP_ENV}
   migrate:
     build:
-      context: ./docker/migrate
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./docker/migrate/Dockerfile
     depends_on:
       - db
     command: ["up"]
     environment:
-      WAIT_HOSTS: ${MYSQL_CONTAINER_HOST}:${MYSQL_CONTAINER_PORT}
+      WAIT_HOSTS: db:3306
       MIGRATIONS_DIR: /migrations
-      MYSQL_HOST: ${MYSQL_CONTAINER_HOST}
-      MYSQL_PORT: ${MYSQL_CONTAINER_PORT}
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
       MYSQL_DATABASE:  ${MYSQL_CONTAINER_DATABASE}
       MYSQL_USER: ${MYSQL_CONTAINER_USER}
       MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
@@ -42,7 +41,7 @@ services:
     image: mysql:8.0.30
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
-      - ${MYSQL_HOST_PORT}:${MYSQL_CONTAINER_PORT}
+      - ${MYSQL_HOST_PORT}:3306
     volumes:
       - ./docker/mysql:/var/lib/mysql
     environment:
