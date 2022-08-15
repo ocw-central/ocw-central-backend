@@ -25,4 +25,5 @@ type Subject struct {
 	freeDescription   string      `desc:"自由な説明"`
 	syllabusId        SyllabusId  `desc:"SyllabusId"`
 	series            string      `desc:"シリーズ"`
+	academicField     string      `desc:"分野名"`
 }
