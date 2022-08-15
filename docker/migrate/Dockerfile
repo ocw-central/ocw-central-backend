@@ -6,4 +6,6 @@ RUN chmod +x /wait
 COPY ./docker/migrate/migrate.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/migrate.sh
 
+
 ENTRYPOINT [ "migrate.sh" ]
+
