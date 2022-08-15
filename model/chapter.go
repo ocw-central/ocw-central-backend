@@ -6,9 +6,8 @@ import (
 	"github.com/oklog/ulid"
 )
 
-type ChapterId struct {
-	id ulid.ULID `desc:"ID"`
-}
+type ChapterId ulid.ULID
+
 type Chapter struct {
 	id            ChapterId `desc:"ID"`
 	startAt       time.Time `desc:"チャプター開始時間"`

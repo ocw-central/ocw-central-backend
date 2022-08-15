@@ -4,9 +4,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
-type SubpageId struct {
-	id ulid.ULID `desc:"ID"`
-}
+type SubpageId ulid.ULID
 
 type Subpage struct {
 	id      SubpageId `desc:"ID"`
