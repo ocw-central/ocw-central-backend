@@ -19,7 +19,7 @@ services:
       MYSQL_USER: ${MYSQL_CONTAINER_USER}
       MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
       MYSQL_DATABASE: ocw-central
-      APP_ENV: ${SERVER_CONTAINER_APP_ENV}
+      APP_ENV: ${APP_ENV}
   migrate:
     build:
       context: ./
