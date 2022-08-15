@@ -3,6 +3,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS subjects(
     id BINARY(16) NOT NULL PRIMARY KEY,
     category VARCHAR(100),
+    academic_field VARCHAR(100),
     title VARCHAR(191) NOT NULL,
     location VARCHAR(100),
     department VARCHAR(100),
