@@ -9,11 +9,11 @@ services:
       - db
       - migrate
     ports:
-      - ${SERVER_HOST_HOST}:${SERVER_HOST_PORT}:8080
+      - ${SERVER_HOST_PORT}:8080
     volumes:
       - ./docker/server:/var/lib/server
     environment:
-      TZ: ${SERVER_CONTAINER_TZ}
+      TZ: Asia/Tokyo
       PORT: 8080
       MYSQL_ADDR: db:3306
       MYSQL_USER: ${MYSQL_CONTAINER_USER}
@@ -32,9 +32,9 @@ services:
       MIGRATIONS_DIR: /migrations
       MYSQL_HOST: db
       MYSQL_PORT: 3306
-      MYSQL_DATABASE:  ${MYSQL_CONTAINER_DATABASE}
       MYSQL_USER: ${MYSQL_CONTAINER_USER}
       MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_DATABASE:  ${MYSQL_CONTAINER_DATABASE}
     volumes:
       - ./migrations:/migrations
   db:
