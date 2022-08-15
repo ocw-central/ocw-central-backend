@@ -24,3 +24,5 @@ go.work
 discussion
 
 docker/mysql
+
+private/
