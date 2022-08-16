@@ -21,3 +21,5 @@ DROP TABLE IF EXISTS subject_faculty_subjects;
 DROP TABLE IF EXISTS syllabus_faculty;
 
 DROP TABLE IF EXISTS video_faculty;
+
+COMMIT;
