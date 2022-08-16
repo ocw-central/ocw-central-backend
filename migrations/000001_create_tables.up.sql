@@ -1,5 +1,4 @@
 BEGIN;
-
 CREATE TABLE IF NOT EXISTS subjects(
     id BINARY(16) NOT NULL PRIMARY KEY,
     category VARCHAR(100),
@@ -15,7 +14,6 @@ CREATE TABLE IF NOT EXISTS subjects(
     updated_at DATETIME NOT NULL,
     INDEX(title)
 );
-
 CREATE TABLE IF NOT EXISTS videos(
     id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(16) NOT NULL,
@@ -28,10 +26,9 @@ CREATE TABLE IF NOT EXISTS videos(
     updated_at DATETIME NOT NULL,
     FOREIGN KEY (subject_id)
         REFERENCES subjects(id)
-        ON DELETE RESTRICT,    
+        ON DELETE RESTRICT,
     INDEX(title)
 );
-
 CREATE TABLE IF NOT EXISTS syllabuses(
     id BINARY(16) NOT NULL PRIMARY KEY,
     language VARCHAR(100),
@@ -54,9 +51,7 @@ CREATE TABLE IF NOT EXISTS syllabuses(
     remark TEXT,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    
 );
-
 CREATE TABLE IF NOT EXISTS chapters(
     id BINARY(16) NOT NULL PRIMARY KEY,
     video_id BINARY(16) NOT NULL,
@@ -69,17 +64,15 @@ CREATE TABLE IF NOT EXISTS chapters(
         REFERENCES videos(id)
         ON DELETE RESTRICT,
 );
-
 CREATE TABLE IF NOT EXISTS faculties(
     id BINARY(16) NOT NULL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     department VARCHAR(100),
     job_title VARCHAR(50),
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,    
+    updated_at DATETIME NOT NULL,
     INDEX(name)
 );
-
 CREATE TABLE IF NOT EXISTS pdfs(
     id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(16) NOT NULL,
@@ -90,19 +83,16 @@ CREATE TABLE IF NOT EXISTS pdfs(
         REFERENCES subjects(id)
         ON DELETE RESTRICT,
 );
-
-
 CREATE TABLE IF NOT EXISTS subpages(
     id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(16) NOT NULL,
     link VARCHAR(200) NOT NULL,
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,    
+    updated_at DATETIME NOT NULL,
     FOREIGN KEY (subject_id)
         REFERENCES subjects(id)
         ON DELETE RESTRICT,
 );
-
 CREATE TABLE IF NOT EXISTS subject_related_subjects(
     subject_id BINARY(16) NOT NULL,
     related_subject_id BINARY(16) NOT NULL,
@@ -114,7 +104,6 @@ CREATE TABLE IF NOT EXISTS subject_related_subjects(
         REFERENCES subjects(id)
         ON DELETE RESTRICT,
 );
-
 CREATE TABLE IF NOT EXISTS subject_faculties(
     subject_id BINARY(16) NOT NULL,
     faculty_id BINARY(16) NOT NULL,
@@ -124,13 +113,12 @@ CREATE TABLE IF NOT EXISTS subject_faculties(
         ON DELETE RESTRICT,
     Foreign Key (faculty_id)
         REFERENCES faculties(id)
-        ON DELETE RESTRICT,    
+        ON DELETE RESTRICT,
 );
-
 CREATE TABLE IF NOT EXISTS syllabus_faculties(
     syllabus_id BINARY(16) NOT NULL,
     faculty_id BINARY(16) NOT NULL,
-    PRIMARY KEY (syllabus_id, faculty_id),    
+    PRIMARY KEY (syllabus_id, faculty_id),
     FOREIGN KEY (syllabus_id)
         REFERENCES syllabuses(id)
         ON DELETE RESTRICT,
@@ -138,11 +126,10 @@ CREATE TABLE IF NOT EXISTS syllabus_faculties(
         REFERENCES faculties(id)
         ON DELETE RESTRICT,
 );
-
 CREATE TABLE IF NOT EXISTS video_faculties(
     video_id BINARY(16) NOT NULL,
     faculty_id BINARY(16) NOT NULL,
-    PRIMARY KEY (video_id, faculty_id),    
+    PRIMARY KEY (video_id, faculty_id),
     FOREIGN KEY (video_id)
         REFERENCES videos(id)
         ON DELETE RESTRICT,
@@ -150,6 +137,5 @@ CREATE TABLE IF NOT EXISTS video_faculties(
         REFERENCES faculties(id)
         ON DELETE RESTRICT,
 );
-
 COMMIT;
 
