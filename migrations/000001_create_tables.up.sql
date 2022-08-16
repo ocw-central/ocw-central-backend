@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS videos(
 );
 
 CREATE TABLE IF NOT EXISTS syllabuses(
+
     id BINARY(16) NOT NULL PRIMARY KEY,
     language VARCHAR(100),
     subject_numbering VARCHAR(100),
@@ -113,7 +114,6 @@ CREATE TABLE IF NOT EXISTS subpages(
         REFERENCES subjects(id)
         ON DELETE RESTRICT,
     
-    INDEX(link) #TODO: need confirmation
 );
 
 CREATE TABLE IF NOT EXISTS subject_related_subjects(
@@ -129,7 +129,6 @@ CREATE TABLE IF NOT EXISTS subject_related_subjects(
         REFERENCES subjects(id)
         ON DELETE RESTRICT,
     
-    INDEX(subject_id) #TODO: need checking
 );
 
 CREATE TABLE IF NOT EXISTS subject_faculty(
@@ -145,7 +144,6 @@ CREATE TABLE IF NOT EXISTS subject_faculty(
         REFERENCES faculties(id)
         ON DELETE RESTRICT,
     
-    INDEX(subject_id) #TODO: need confirmation
 );
 
 CREATE TABLE IF NOT EXISTS syllabus_faculty(
@@ -161,7 +159,6 @@ CREATE TABLE IF NOT EXISTS syllabus_faculty(
         REFERENCES faculties(id)
         ON DELETE RESTRICT,
     
-    INDEX(syllabus_id) #TODO: need confirmation
 );
 
 CREATE TABLE IF NOT EXISTS video_faculty(
@@ -177,7 +174,6 @@ CREATE TABLE IF NOT EXISTS video_faculty(
         REFERENCES faculties(id)
         ON DELETE RESTRICT,
     
-    INDEX(video_id) #TODO: need confirmation
 );
 
 COMMIT;
