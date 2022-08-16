@@ -152,3 +152,4 @@ CREATE TABLE IF NOT EXISTS video_faculties(
 );
 
 COMMIT;
+
