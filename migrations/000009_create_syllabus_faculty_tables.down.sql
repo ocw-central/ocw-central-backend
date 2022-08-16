@@ -1,5 +1,0 @@
-BEGIN;
-
-DROP TABLE IF EXISTS syllabus_faculty;
-
-COMMIT;
