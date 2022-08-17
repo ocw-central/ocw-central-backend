@@ -73,10 +73,13 @@ CREATE TABLE IF NOT EXISTS faculties(
     updated_at DATETIME NOT NULL,
     INDEX(name)
 );
-CREATE TABLE IF NOT EXISTS pdfs(
+CREATE TABLE IF NOT EXISTS resources(
     id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(16) NOT NULL,
-    link VARCHAR(200) NOT NULL,
+    title VARCHAR(191),
+    description TEXT,
+    ordering INT NOT NULL,
+    link VARCHAR(200),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     FOREIGN KEY (subject_id)
