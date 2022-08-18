@@ -6,9 +6,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
-type VideoId struct {
-	id ulid.ULID `desc:"ID"`
-}
+type VideoId ulid.ULID
 
 type Video struct {
 	id          VideoId       `desc:"ID"`

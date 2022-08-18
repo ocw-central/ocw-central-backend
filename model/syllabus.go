@@ -6,9 +6,8 @@ import (
 	"github.com/oklog/ulid"
 )
 
-type SyllabusId struct {
-	id ulid.ULID `desc:"ID"`
-}
+type SyllabusId ulid.ULID
+
 type Syllabus struct {
 	id                SyllabusId   `desc:"ID"`
 	facultyIds        []FacultyId  `desc:"FacultyIDs"`
