@@ -4,9 +4,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
-type PdfId struct {
-	id ulid.ULID `desc:"ID"`
-}
+type PdfId ulid.ULID
 
 type Pdf struct {
 	id   PdfId  `desc:"ID"`

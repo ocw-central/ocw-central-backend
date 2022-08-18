@@ -6,9 +6,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
-type SubjectId struct {
-	id ulid.ULID `desc:"ID"`
-}
+type SubjectId ulid.ULID
 
 type Subject struct {
 	id                SubjectId   `desc:"ID"`
