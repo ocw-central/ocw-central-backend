@@ -4,10 +4,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
-type ResourceId ulid.ULID {
-	id ulid.ULID `desc:"ID"`
-}
-
+type ResourceId ulid.ULID
 type Resource struct {
 	id          ResourceId `desc:"ID"`
 	title       string     `desc:"名前"`
