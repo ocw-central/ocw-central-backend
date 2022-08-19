@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS syllabuses(
 CREATE TABLE IF NOT EXISTS chapters(
     id BINARY(16) NOT NULL PRIMARY KEY,
     video_id BINARY(16) NOT NULL,
-    start_at INT NOT NULL,
+    start_at INT,
+    duratino INT,
     topic VARCHAR(100) NOT NULL,
     thumbnail_link VARCHAR(200) NOT NULL,
     created_at DATETIME NOT NULL,
