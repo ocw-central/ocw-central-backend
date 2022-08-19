@@ -5,6 +5,7 @@ import (
 )
 
 type ResourceId ulid.ULID
+
 type Resource struct {
 	id          ResourceId `desc:"ID"`
 	title       string     `desc:"名前"`
