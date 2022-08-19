@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS videos(
     id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(16) NOT NULL,
     title VARCHAR(191) NOT NULL,
+    ordering INT NOT NULL,
     link VARCHAR(200) NOT NULL,
     lectured_on DATE,
     video_length INT,
