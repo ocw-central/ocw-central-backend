@@ -11,6 +11,7 @@ type VideoId ulid.ULID
 type Video struct {
 	id          VideoId       `desc:"ID"`
 	title       string        `desc:"タイトル"`
+	ordering    int           `desc:"順番"`
 	link        string        `desc:"リンク"`
 	chapters    []Chapter     `desc:"チャプターs"`
 	facultyIds  []FacultyId   `desc:"FacultyIds"`
