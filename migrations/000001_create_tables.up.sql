@@ -41,16 +41,7 @@ CREATE TABLE IF NOT EXISTS syllabuses(
     course_format VARCHAR(100),
     assigned_grade VARCHAR(100),
     targeted_audience VARCHAR(100),
-    day_of_week ENUM(
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
-    ),
-    course_period VARCHAR(100),
+    course_day_period VARCHAR(191),
     outline TEXT,
     objective TEXT,
     lesson_plan TEXT,

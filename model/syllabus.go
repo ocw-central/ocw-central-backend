@@ -19,8 +19,7 @@ type Syllabus struct {
 	courceFormat      string       `desc:"授業形態"`
 	assignedGrade     string       `desc:"配当学年"`
 	targetedAudience  string       `desc:"対象学生"`
-	dayOfWeek         time.Weekday `desc:"曜日"`
-	courcePeriod      string       `desc:"時限"`
+	courceDayPeriod   string       `desc:"曜時限"`
 	outline           string       `desc:"授業の概要・目的"`
 	objective         string       `desc:"到達目標"`
 	lessonPlan        string       `desc:"授業計画と内容"`
