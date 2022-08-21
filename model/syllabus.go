@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"github.com/oklog/ulid"
 )
 
