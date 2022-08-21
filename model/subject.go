@@ -18,7 +18,7 @@ type Subject struct {
 	relatedSubjectIds []SubjectId  `desc:"関連科目IDs"`
 	department        string       `desc:"開講部局名"`
 	firstHeldOn       time.Time    `desc:"開催日"`
-	facultyIds        []FacultyId  `desc:"FacultyIds"`
+	faculty.          string       `desc:"FacultyIds"`
 	language          string       `desc:"使用言語"`
 	freeDescription   string       `desc:"自由な説明"`
 	syllabusId        SyllabusId   `desc:"SyllabusId"`
