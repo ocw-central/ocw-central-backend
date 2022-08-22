@@ -1,0 +1,4 @@
+type Subpage implements Node {
+  id: ID!
+  content: String!
+}

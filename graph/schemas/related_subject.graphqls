@@ -1,0 +1,18 @@
+type RelatedSubject implements Node {
+  id: ID!
+  category: String!
+  title: String!
+  videoIds: [ID!]!
+  location: String!
+  resourceIds: [ID!]!
+  relatedSubjectIds: [ID!]!
+  department: String!
+  firstHeldOn: Time!
+  faculty: String!
+  language: String!
+  freeDescription: String!
+  syllabusId: ID!
+  series: String!
+  academicField: String!
+  thumbnailLink: String!
+}
