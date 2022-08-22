@@ -1,16 +1,16 @@
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS subjects(
-    id BINARY(16) NOT NULL PRIMARY KEY,
+    id BINARY(255) NOT NULL PRIMARY KEY,
     category VARCHAR(100),
     academic_field VARCHAR(100),
-    title VARCHAR(191) NOT NULL,
-    faculty VARCHAR(191),
-    location VARCHAR(100),
-    department VARCHAR(100),
+    title VARCHAR(400) NOT NULL,
+    faculty VARCHAR(2000),
+    location VARCHAR(300),
+    department VARCHAR(300),
     language VARCHAR(100),
     first_held_on DATE,
-    free_description VARCHAR(5000),
+    free_description TEXT,
     series VARCHAR(191),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS subjects(
 );
 
 CREATE TABLE IF NOT EXISTS videos(
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    subject_id BINARY(16) NOT NULL,
-    title VARCHAR(191) NOT NULL,
-    faculty VARCHAR(191),
+    id BINARY(255) NOT NULL PRIMARY KEY,
+    subject_id BINARY(255) NOT NULL,
+    title VARCHAR(400) NOT NULL,
+    faculty VARCHAR(1000),
     ordering INT NOT NULL,
     link VARCHAR(200) NOT NULL,
     lectured_on DATE,
@@ -34,8 +34,9 @@ CREATE TABLE IF NOT EXISTS videos(
 );
 
 CREATE TABLE IF NOT EXISTS syllabuses(
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    faculty VARCHAR(191),
+    id BINARY(255) NOT NULL PRIMARY KEY,
+    subject_id BINARY(255) NOT NULL,
+    faculty VARCHAR(2000),
     language VARCHAR(100),
     subject_numbering VARCHAR(100),
     academic_year INT,
@@ -58,10 +59,10 @@ CREATE TABLE IF NOT EXISTS syllabuses(
 );
 
 CREATE TABLE IF NOT EXISTS chapters(
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    video_id BINARY(16) NOT NULL,
+    id BINARY(255) NOT NULL PRIMARY KEY,
+    video_id BINARY(255) NOT NULL,
     start_at INT NOT NULL,
-    topic VARCHAR(100) NOT NULL,
+    topic VARCHAR(500) NOT NULL,
     thumbnail_link VARCHAR(200) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
@@ -69,9 +70,9 @@ CREATE TABLE IF NOT EXISTS chapters(
 );
 
 CREATE TABLE IF NOT EXISTS resources(
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    subject_id BINARY(16) NOT NULL,
-    title VARCHAR(191),
+    id BINARY(255) NOT NULL PRIMARY KEY,
+    subject_id BINARY(255) NOT NULL,
+    title VARCHAR(400),
     description TEXT,
     ordering INT NOT NULL,
     link VARCHAR(200),
@@ -81,8 +82,8 @@ CREATE TABLE IF NOT EXISTS resources(
 );
 
 CREATE TABLE IF NOT EXISTS subpages(
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    subject_id BINARY(16) NOT NULL,
+    id BINARY(255) NOT NULL PRIMARY KEY,
+    subject_id BINARY(255) NOT NULL,
     link VARCHAR(200) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
@@ -90,8 +91,10 @@ CREATE TABLE IF NOT EXISTS subpages(
 );
 
 CREATE TABLE IF NOT EXISTS subject_related_subjects(
-    subject_id BINARY(16) NOT NULL,
-    related_subject_id BINARY(16) NOT NULL,
+    subject_id BINARY(255) NOT NULL,
+    related_subject_id BINARY(255) NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     PRIMARY KEY (subject_id, related_subject_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
     FOREIGN KEY (related_subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
