@@ -21,7 +21,7 @@ type Subject struct {
 	faculty           string       `desc:"教員の氏名と所属職位"`
 	language          string       `desc:"使用言語"`
 	freeDescription   string       `desc:"自由な説明"`
-	syllabusId        SyllabusId   `desc:"SyllabusId"`
+	syllabusId        *SyllabusId  `desc:"SyllabusId"`
 	series            string       `desc:"シリーズ"`
 	academicField     string       `desc:"分野名"`
 	thumbnailLink     string       `desc:"サムネイルのリンク"`
