@@ -6,6 +6,20 @@ import (
 
 type SyllabusId ulid.ULID
 
+func NewSyllabusId[T string | []byte](ulidExp T) (*SyllabusId, error) {
+	var scannedULID ulid.ULID
+	err := scannedULID.Scan(ulidExp)
+	if err != nil {
+		return nil, err
+	}
+	syllabusId := SyllabusId(scannedULID)
+	return &syllabusId, nil
+}
+
+func (s SyllabusId) String() string {
+	return ulid.ULID(s).String()
+}
+
 type Syllabus struct {
 	id                SyllabusId  `desc:"ID"`
 	faculty           string      `desc:"教員の氏名と所属職位"`

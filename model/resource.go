@@ -6,6 +6,21 @@ import (
 
 type ResourceId ulid.ULID
 
+// NewResourceId generate a new ResourceId from a string or []byte representation of a ULID.
+func NewResourceId[T string | []byte](ulidExp T) (*ResourceId, error) {
+	var scannedULID ulid.ULID
+	err := scannedULID.Scan(ulidExp)
+	if err != nil {
+		return nil, err
+	}
+	resourceId := ResourceId(scannedULID)
+	return &resourceId, nil
+}
+
+func (s ResourceId) String() string {
+	return ulid.ULID(s).String()
+}
+
 type Resource struct {
 	id          ResourceId `desc:"ID"`
 	title       string     `desc:"名前"`

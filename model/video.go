@@ -8,6 +8,21 @@ import (
 
 type VideoId ulid.ULID
 
+// NewVideoId generate a new VideoId from a string or []byte representation of a ULID.
+func NewVideoId[T string | []byte](ulidExp T) (*VideoId, error) {
+	var scannedULID ulid.ULID
+	err := scannedULID.Scan(ulidExp)
+	if err != nil {
+		return nil, err
+	}
+	videoId := VideoId(scannedULID)
+	return &videoId, nil
+}
+
+func (s VideoId) String() string {
+	return ulid.ULID(s).String()
+}
+
 type Video struct {
 	id          VideoId       `desc:"ID"`
 	title       string        `desc:"タイトル"`
