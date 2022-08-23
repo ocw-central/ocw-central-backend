@@ -24,4 +24,5 @@ type Subject struct {
 	syllabusId        SyllabusId   `desc:"SyllabusId"`
 	series            string       `desc:"シリーズ"`
 	academicField     string       `desc:"分野名"`
+	thumbnailLink     string       `desc:"サムネイルのリンク"`
 }

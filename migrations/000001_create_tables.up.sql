@@ -3,7 +3,6 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS subjects(
     id BINARY(16) NOT NULL PRIMARY KEY,
     category VARCHAR(100),
-    academic_field VARCHAR(100),
     title VARCHAR(400) NOT NULL,
     faculty VARCHAR(2000),
     location VARCHAR(300),
@@ -13,6 +12,8 @@ CREATE TABLE IF NOT EXISTS subjects(
     free_description TEXT,
     syllabus_id BINARY(255),
     series VARCHAR(191),
+    academic_field VARCHAR(100),
+    thumbnail_link VARCHAR(200),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     INDEX(title)
