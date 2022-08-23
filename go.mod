@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.14
+	github.com/google/wire v0.5.0
 	github.com/oklog/ulid v1.3.1
 	github.com/vektah/gqlparser/v2 v2.4.8
 )
