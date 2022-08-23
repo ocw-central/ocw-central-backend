@@ -6,5 +6,22 @@ package graph
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-type Resolver struct {}
+import (
+	"github.com/kafugen/ocwcentral/domain/usecase"
+)
 
+type Resolver struct {
+	sbU usecase.SubjectUsecase
+	vU  usecase.VideoUsecase
+	rU  usecase.ResourceUsecase
+	slU usecase.SyllabusUsecase
+}
+
+func NewResolver(
+	sbU usecase.SubjectUsecase,
+	vU usecase.VideoUsecase,
+	rU usecase.ResourceUsecase,
+	slU usecase.SyllabusUsecase,
+) Resolver {
+	return Resolver{sbU, vU, rU, slU}
+}
