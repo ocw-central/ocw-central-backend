@@ -7,6 +7,7 @@
 package main
 
 import (
+	"github.com/kafugen/ocwcentral/env"
 	"github.com/kafugen/ocwcentral/graph"
 	"github.com/kafugen/ocwcentral/interactor"
 	"github.com/kafugen/ocwcentral/persistence"
@@ -15,13 +16,15 @@ import (
 // Injectors from wire.go:
 
 func InitializeResolver() graph.Resolver {
-	subjectRepositoryImpl := persistence.NewSubjectRepositoryImpl()
+	envConfig := env.NewEnvConfig()
+	db := persistence.NewDB(envConfig)
+	subjectRepositoryImpl := persistence.NewSubjectRepositoryImpl(db)
 	subjectInteractor := interactor.NewSubjectInteractor(subjectRepositoryImpl)
-	videoRepositoryImpl := persistence.NewVideoRepositoryImpl()
+	videoRepositoryImpl := persistence.NewVideoRepositoryImpl(db)
 	videoInteractor := interactor.NewVideoInteractor(videoRepositoryImpl)
-	resourceRepositoryImpl := persistence.NewResourceRepositoryImpl()
+	resourceRepositoryImpl := persistence.NewResourceRepositoryImpl(db)
 	resourceInteractor := interactor.NewResourceInteractor(resourceRepositoryImpl)
-	syllabusRepositoryImpl := persistence.NewSyllabusRepositoryImpl()
+	syllabusRepositoryImpl := persistence.NewSyllabusRepositoryImpl(db)
 	syllabusInteractor := interactor.NewSyllabusInteractor(syllabusRepositoryImpl)
 	resolver := graph.NewResolver(subjectInteractor, videoInteractor, resourceInteractor, syllabusInteractor)
 	return resolver

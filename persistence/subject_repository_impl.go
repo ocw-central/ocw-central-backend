@@ -2,13 +2,16 @@ package persistence
 
 import (
 	"github.com/kafugen/ocwcentral/model"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type SubjectRepositoryImpl struct {
+	db *sqlx.DB
 }
 
-func NewSubjectRepositoryImpl() SubjectRepositoryImpl {
-	return SubjectRepositoryImpl{}
+func NewSubjectRepositoryImpl(db *sqlx.DB) SubjectRepositoryImpl {
+	return SubjectRepositoryImpl{db}
 }
 
 func (sR SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, error) {

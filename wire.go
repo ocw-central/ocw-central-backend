@@ -7,6 +7,7 @@ import (
 
 	"github.com/kafugen/ocwcentral/domain/repository"
 	"github.com/kafugen/ocwcentral/domain/usecase"
+	"github.com/kafugen/ocwcentral/env"
 	"github.com/kafugen/ocwcentral/graph"
 	"github.com/kafugen/ocwcentral/interactor"
 	"github.com/kafugen/ocwcentral/persistence"
@@ -33,6 +34,9 @@ func InitializeResolver() graph.Resolver {
 		wire.Bind(new(repository.VideoRepository), new(persistence.VideoRepositoryImpl)),
 		wire.Bind(new(repository.ResourceRepository), new(persistence.ResourceRepositoryImpl)),
 		wire.Bind(new(repository.SyllabusRepository), new(persistence.SyllabusRepositoryImpl)),
+
+		persistence.NewDB,
+		env.NewEnvConfig,
 	)
 	return graph.Resolver{}
 }
