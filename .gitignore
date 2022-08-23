@@ -26,3 +26,4 @@ discussion
 docker/mysql
 
 private/
+.vscode/
