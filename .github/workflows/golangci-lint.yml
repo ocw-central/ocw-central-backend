@@ -4,13 +4,14 @@ on:
     tags:
       - v*
     branches:
-      - master
       - main
+      - develop
+      - add-CI
   pull_request:
 permissions:
   contents: read
   # Optional: allow read access to pull request. Use with `only-new-issues` option.
-  # pull-requests: read
+  pull-requests: read
 jobs:
   golangci:
     name: lint
