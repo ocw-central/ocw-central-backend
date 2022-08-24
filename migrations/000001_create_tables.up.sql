@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS subjects(
     language VARCHAR(100),
     first_held_on DATE,
     free_description TEXT,
+    syllabus_id BINARY(255),
     series VARCHAR(191),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
@@ -35,7 +36,7 @@ CREATE TABLE IF NOT EXISTS videos(
 
 CREATE TABLE IF NOT EXISTS syllabuses(
     id BINARY(16) NOT NULL PRIMARY KEY,
-    subject_id BINARY(255) NOT NULL,
+    subject_id BINARY(16) NOT NULL,
     faculty VARCHAR(2000),
     language VARCHAR(100),
     subject_numbering VARCHAR(100),
