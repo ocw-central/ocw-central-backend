@@ -3,23 +3,26 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS subjects(
     id BINARY(16) NOT NULL PRIMARY KEY,
     category VARCHAR(100),
-    academic_field VARCHAR(100),
-    title VARCHAR(191) NOT NULL,
-    location VARCHAR(100),
-    department VARCHAR(100),
+    title VARCHAR(400) NOT NULL,
+    faculty VARCHAR(2000),
+    location VARCHAR(300),
+    department VARCHAR(300),
     language VARCHAR(100),
     first_held_on DATE,
-    free_description VARCHAR(5000),
+    free_description TEXT,
+    syllabus_id BINARY(255),
     series VARCHAR(191),
+    academic_field VARCHAR(100),
+    thumbnail_link VARCHAR(200),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    INDEX(title)
 );
 
 CREATE TABLE IF NOT EXISTS videos(
     id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(16) NOT NULL,
-    title VARCHAR(191) NOT NULL,
+    title VARCHAR(400) NOT NULL,
+    faculty VARCHAR(1000),
     ordering INT NOT NULL,
     link VARCHAR(200) NOT NULL,
     lectured_on DATE,
@@ -33,6 +36,8 @@ CREATE TABLE IF NOT EXISTS videos(
 
 CREATE TABLE IF NOT EXISTS syllabuses(
     id BINARY(16) NOT NULL PRIMARY KEY,
+    subject_id BINARY(16) NOT NULL,
+    faculty VARCHAR(2000),
     language VARCHAR(100),
     subject_numbering VARCHAR(100),
     academic_year INT,
@@ -58,27 +63,17 @@ CREATE TABLE IF NOT EXISTS chapters(
     id BINARY(16) NOT NULL PRIMARY KEY,
     video_id BINARY(16) NOT NULL,
     start_at INT NOT NULL,
-    topic VARCHAR(100) NOT NULL,
+    topic VARCHAR(500) NOT NULL,
     thumbnail_link VARCHAR(200) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS faculties(
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    department VARCHAR(100),
-    job_title VARCHAR(50),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    INDEX(name)
-);
-
 CREATE TABLE IF NOT EXISTS resources(
     id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(16) NOT NULL,
-    title VARCHAR(191),
+    title VARCHAR(400),
     description TEXT,
     ordering INT NOT NULL,
     link VARCHAR(200),
@@ -99,33 +94,11 @@ CREATE TABLE IF NOT EXISTS subpages(
 CREATE TABLE IF NOT EXISTS subject_related_subjects(
     subject_id BINARY(16) NOT NULL,
     related_subject_id BINARY(16) NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     PRIMARY KEY (subject_id, related_subject_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
     FOREIGN KEY (related_subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
-);
-
-CREATE TABLE IF NOT EXISTS subject_faculties(
-    subject_id BINARY(16) NOT NULL,
-    faculty_id BINARY(16) NOT NULL,
-    PRIMARY KEY (subject_id, faculty_id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
-    FOREIGN Key (faculty_id) REFERENCES faculties(id) ON DELETE RESTRICT
-);
-
-CREATE TABLE IF NOT EXISTS syllabus_faculties(
-    syllabus_id BINARY(16) NOT NULL,
-    faculty_id BINARY(16) NOT NULL,
-    PRIMARY KEY (syllabus_id, faculty_id),
-    FOREIGN KEY (syllabus_id) REFERENCES syllabuses(id) ON DELETE RESTRICT,
-    FOREIGN Key (faculty_id) REFERENCES faculties(id) ON DELETE RESTRICT
-);
-
-CREATE TABLE IF NOT EXISTS video_faculties(
-    video_id BINARY(16) NOT NULL,
-    faculty_id BINARY(16) NOT NULL,
-    PRIMARY KEY (video_id, faculty_id),
-    FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE RESTRICT,
-    FOREIGN Key (faculty_id) REFERENCES faculties(id) ON DELETE RESTRICT
 );
 
 COMMIT;
