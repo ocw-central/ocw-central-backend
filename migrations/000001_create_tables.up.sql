@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS subjects(
     thumbnail_link VARCHAR(200),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    INDEX(title)
 );
 
 CREATE TABLE IF NOT EXISTS videos(
