@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS subjects(
-    id BINARY(255) NOT NULL PRIMARY KEY,
+    id BINARY(16) NOT NULL PRIMARY KEY,
     category VARCHAR(100),
     academic_field VARCHAR(100),
     title VARCHAR(400) NOT NULL,
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS subjects(
 );
 
 CREATE TABLE IF NOT EXISTS videos(
-    id BINARY(255) NOT NULL PRIMARY KEY,
-    subject_id BINARY(255) NOT NULL,
+    id BINARY(16) NOT NULL PRIMARY KEY,
+    subject_id BINARY(16) NOT NULL,
     title VARCHAR(400) NOT NULL,
     faculty VARCHAR(1000),
     ordering INT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS videos(
 );
 
 CREATE TABLE IF NOT EXISTS syllabuses(
-    id BINARY(255) NOT NULL PRIMARY KEY,
+    id BINARY(16) NOT NULL PRIMARY KEY,
     subject_id BINARY(255) NOT NULL,
     faculty VARCHAR(2000),
     language VARCHAR(100),
@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS syllabuses(
 );
 
 CREATE TABLE IF NOT EXISTS chapters(
-    id BINARY(255) NOT NULL PRIMARY KEY,
-    video_id BINARY(255) NOT NULL,
+    id BINARY(16) NOT NULL PRIMARY KEY,
+    video_id BINARY(16) NOT NULL,
     start_at INT NOT NULL,
     topic VARCHAR(500) NOT NULL,
     thumbnail_link VARCHAR(200) NOT NULL,
@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS chapters(
 );
 
 CREATE TABLE IF NOT EXISTS resources(
-    id BINARY(255) NOT NULL PRIMARY KEY,
-    subject_id BINARY(255) NOT NULL,
+    id BINARY(16) NOT NULL PRIMARY KEY,
+    subject_id BINARY(16) NOT NULL,
     title VARCHAR(400),
     description TEXT,
     ordering INT NOT NULL,
@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS resources(
 );
 
 CREATE TABLE IF NOT EXISTS subpages(
-    id BINARY(255) NOT NULL PRIMARY KEY,
-    subject_id BINARY(255) NOT NULL,
+    id BINARY(16) NOT NULL PRIMARY KEY,
+    subject_id BINARY(16) NOT NULL,
     link VARCHAR(200) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS subpages(
 );
 
 CREATE TABLE IF NOT EXISTS subject_related_subjects(
-    subject_id BINARY(255) NOT NULL,
-    related_subject_id BINARY(255) NOT NULL,
+    subject_id BINARY(16) NOT NULL,
+    related_subject_id BINARY(16) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     PRIMARY KEY (subject_id, related_subject_id),
