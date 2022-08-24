@@ -10,12 +10,11 @@ CREATE TABLE IF NOT EXISTS subjects(
     language VARCHAR(100),
     first_held_on DATE,
     free_description TEXT,
-    syllabus_id BINARY(255),
     series VARCHAR(191),
     academic_field VARCHAR(100),
     thumbnail_link VARCHAR(200),
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS videos(
@@ -30,8 +29,7 @@ CREATE TABLE IF NOT EXISTS videos(
     language VARCHAR(100),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
-    INDEX(title)
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS syllabuses(
