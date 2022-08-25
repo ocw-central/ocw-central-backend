@@ -13,7 +13,29 @@ import (
 
 // Videos is the resolver for the videos field.
 func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*model.Video, error) {
-	panic(fmt.Errorf("not implemented: Videos - videos"))
+	videoDTOs, err := r.vU.GetByIds(obj.VideoIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` func of VideoUsecase: %w", err)
+	}
+
+	videos := make([]*model.Video, len(videoDTOs))
+	for i, videoDTO := range videoDTOs {
+		chapters := make([]model.Chapter, len(videoDTO.Chapters))
+		for i, chapter := range videoDTO.Chapters {
+			chapters[i] = model.Chapter(chapter)
+		}
+		videos[i] = &model.Video{
+			ID:          videoDTO.ID,
+			Title:       videoDTO.Title,
+			Link:        videoDTO.Link,
+			Chapters:    chapters,
+			Faculty:     videoDTO.Faculty,
+			LecturedOn:  videoDTO.LecturedOn,
+			VideoLength: videoDTO.VideoLength,
+			Language:    videoDTO.Language,
+		}
+	}
+	return videos, nil
 }
 
 // Resources is the resolver for the resources field.

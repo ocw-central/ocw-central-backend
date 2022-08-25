@@ -23,6 +23,11 @@ func (s VideoId) String() string {
 	return ulid.ULID(s).String()
 }
 
+func (s VideoId) ByteSlice() []byte {
+	bytes := [16]byte(s)
+	return bytes[:]
+}
+
 type Video struct {
 	id          VideoId       `desc:"ID"`
 	title       string        `desc:"タイトル"`
@@ -33,4 +38,21 @@ type Video struct {
 	lecturedOn  time.Time     `desc:"講義日"`
 	videoLength time.Duration `desc:"動画の長さ"`
 	language    string        `desc:"使用言語"`
+}
+
+func NewVideoFromRepository(
+	id VideoId,
+	title string,
+	ordering int,
+	link string,
+	chapters []Chapter,
+	faculty string,
+	lecturedOn time.Time,
+	videoLength time.Duration,
+	language string,
+) *Video {
+	return &Video{
+		id, title, ordering, link, chapters, faculty,
+		lecturedOn, videoLength, language,
+	}
 }

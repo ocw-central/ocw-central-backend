@@ -27,3 +27,17 @@ type Chapter struct {
 	topic         string    `desc:"チャプタータイトル"`
 	thumbnailLink string    `desc:"サムネイルリンク"`
 }
+
+func NewChapterFromRepository(
+	id ChapterId,
+	startAt int,
+	topic string,
+	thumbnailLink string,
+) *Chapter {
+	return &Chapter{
+		id:            id,
+		startAt:       startAt,
+		topic:         topic,
+		thumbnailLink: thumbnailLink,
+	}
+}
