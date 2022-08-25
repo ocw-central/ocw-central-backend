@@ -8,7 +8,7 @@ type SyllabusId ulid.ULID
 
 type Syllabus struct {
 	id                SyllabusId  `desc:"ID"`
-	faculty           string       `desc:"教員の氏名と所属職位"`
+	faculty           string      `desc:"教員の氏名と所属職位"`
 	language          string      `desc:"使用言語"`
 	subjectNumbering  string      `desc:"科目ナンバリング"`
 	academicYear      int16       `desc:"開講年度"`
