@@ -13,7 +13,12 @@ import (
 
 // Subject is the resolver for the subject field.
 func (r *queryResolver) Subject(ctx context.Context, id string) (*model.Subject, error) {
-	panic(fmt.Errorf("not implemented: Subject - Subject"))
+	subject, err := r.sbU.GetById(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetById` func of SubjectUsecase: %w", err)
+	}
+	s := model.Subject(*subject)
+	return &s, nil
 }
 
 // Subjects is the resolver for the subjects field.
