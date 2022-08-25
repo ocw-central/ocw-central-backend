@@ -2,7 +2,7 @@ FROM golang:alpine3.16 as builder
 WORKDIR /workspace
 COPY . /workspace
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main main.go && chmod +x ./main
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main server.go wire_gen.go && chmod +x ./main
 
 FROM alpine:3.15
 WORKDIR /app
