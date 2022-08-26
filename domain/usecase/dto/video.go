@@ -7,6 +7,7 @@ import (
 type VideoDTO struct {
 	ID          string       `json:"id"`
 	Title       string       `json:"title"`
+	Ordering    int          `json:"ordering"`
 	Link        string       `json:"link"`
 	Chapters    []ChapterDTO `json:"chapters"`
 	Faculty     string       `json:"faculty"`

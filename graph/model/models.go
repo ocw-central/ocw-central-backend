@@ -60,6 +60,7 @@ func (this Syllabus) GetID() string { return this.ID }
 // type Video dto.VideoDTO
 type Video struct {
 	ID          string    `json:"id"`
+	Ordering    int       `json:"ordering"`
 	Title       string    `json:"title"`
 	Link        string    `json:"link"`
 	Chapters    []Chapter `json:"chapters"`

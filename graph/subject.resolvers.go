@@ -27,6 +27,7 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 		videos[i] = &model.Video{
 			ID:          videoDTO.ID,
 			Title:       videoDTO.Title,
+			Ordering:    videoDTO.Ordering,
 			Link:        videoDTO.Link,
 			Chapters:    chapters,
 			Faculty:     videoDTO.Faculty,

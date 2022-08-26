@@ -138,6 +138,7 @@ type ComplexityRoot struct {
 		Language    func(childComplexity int) int
 		LecturedOn  func(childComplexity int) int
 		Link        func(childComplexity int) int
+		Ordering    func(childComplexity int) int
 		Title       func(childComplexity int) int
 		VideoLength func(childComplexity int) int
 	}
@@ -678,6 +679,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Video.Link(childComplexity), true
 
+	case "Video.ordering":
+		if e.complexity.Video.Ordering == nil {
+			break
+		}
+
+		return e.complexity.Video.Ordering(childComplexity), true
+
 	case "Video.title":
 		if e.complexity.Video.Title == nil {
 			break
@@ -841,6 +849,7 @@ scalar Time
 	{Name: "../schemas/video.graphqls", Input: `type Video implements Node {
   id: ID!
   title: String!
+  ordering: Int!
   link: String!
   chapters: [Chapter!]!
   faculty: String!
@@ -2530,6 +2539,8 @@ func (ec *executionContext) fieldContext_Subject_videos(ctx context.Context, fie
 				return ec.fieldContext_Video_id(ctx, field)
 			case "title":
 				return ec.fieldContext_Video_title(ctx, field)
+			case "ordering":
+				return ec.fieldContext_Video_ordering(ctx, field)
 			case "link":
 				return ec.fieldContext_Video_link(ctx, field)
 			case "chapters":
@@ -4222,6 +4233,50 @@ func (ec *executionContext) fieldContext_Video_title(ctx context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Video_ordering(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Video_ordering(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ordering, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Video_ordering(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Video",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7067,6 +7122,13 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 		case "title":
 
 			out.Values[i] = ec._Video_title(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "ordering":
+
+			out.Values[i] = ec._Video_ordering(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++

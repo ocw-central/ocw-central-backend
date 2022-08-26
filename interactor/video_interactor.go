@@ -46,6 +46,7 @@ func (sI VideoInteractor) GetByIds(ids []string) ([]*dto.VideoDTO, error) {
 		videoDTOs[i] = &dto.VideoDTO{
 			ID:          video.Id().String(),
 			Title:       video.Title(),
+			Ordering:    video.Ordering(),
 			Link:        video.Link(),
 			Chapters:    chapterDTOs,
 			Faculty:     video.Faculty(),
