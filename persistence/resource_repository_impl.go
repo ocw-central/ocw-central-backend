@@ -1,9 +1,13 @@
 package persistence
 
 import (
-	"github.com/kafugen/ocwcentral/model"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
+
+	"github.com/kafugen/ocwcentral/model"
+	"github.com/kafugen/ocwcentral/persistence/dto"
+	"github.com/kafugen/ocwcentral/utils"
 )
 
 type ResourceRepositoryImpl struct {
@@ -15,5 +19,45 @@ func NewResourceRepositoryImpl(db *sqlx.DB) ResourceRepositoryImpl {
 }
 
 func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Resource, error) {
-	panic("not implemented")
+	resourceIdBytes := make([]interface{}, len(ids))
+	for i, id := range ids {
+		resourceIdBytes[i] = id.ByteSlice()
+	}
+	resourceSQL := `
+        SELECT
+            resources.id
+            subject_id
+            title
+            description
+            ordering
+            link
+        FROM resources
+        WHERE id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
+`
+
+	var resourceDTOs []dto.ResourceDTO
+	if err := vR.db.Select(&resourceDTOs, resourceSQL, resourceIdBytes...); err != nil {
+		return nil, fmt.Errorf("failed on select to `resources` table: %w", err)
+	}
+
+	resources := make([]*model.Resource, len(ids))
+
+	for rowIndex := 0; rowIndex < len(ids); rowIndex++ {
+		resourceDTO := resourceDTOs[rowIndex]
+
+		resourceId, err := model.NewResourceId(*resourceDTO.Id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create `resourceId`: %w", err)
+		}
+
+		resources[rowIndex] = model.NewResourceFromRepository(
+
+			*resourceId,
+			utils.ConvertNilToZeroValue(resourceDTO.Title),
+			*resourceDTO.Ordering,
+			utils.ConvertNilToZeroValue(resourceDTO.Description),
+			utils.ConvertNilToZeroValue(resourceDTO.Link),
+		)
+	}
+	return resources, nil
 }
