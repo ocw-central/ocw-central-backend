@@ -10,8 +10,6 @@ import (
 	"github.com/kafugen/ocwcentral/graph/generated"
 )
 
-const defaultPort = "8080"
-
 func main() {
 	env := env.NewEnvConfig()
 	resolver := InitializeResolver()
