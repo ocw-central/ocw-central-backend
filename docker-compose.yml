@@ -13,6 +13,7 @@ services:
     volumes:
       - ./docker/server:/var/lib/server
     environment:
+      WAIT_HOSTS: db:3306
       TZ: Asia/Tokyo
       PORT: 8080
       MYSQL_ADDR: db:3306

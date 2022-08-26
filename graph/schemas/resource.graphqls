@@ -1,0 +1,7 @@
+type Resource implements Node {
+  id: ID!
+  title: String!
+  ordering: Int!
+  description: String!
+  link: String!
+}

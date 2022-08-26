@@ -1,0 +1,10 @@
+type Video implements Node {
+  id: ID!
+  title: String!
+  link: String!
+  chapters: [Chapter!]!
+  faculty: String!
+  lecturedOn: Time!
+  videoLength: Int!
+  language: String!
+}
