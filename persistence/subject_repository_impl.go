@@ -105,13 +105,8 @@ func (sR SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, err
 		syllabusId = nil
 	}
 
-	// change Id type from []byte (slice) to [16]byte (array)
-	// this will be able to be written as `([16]byte)(*subjectDTO.Id)`
-	// https://github.com/golang/go/issues/46505
-	subjectId := *(*[16]byte)(*subjectDTO.Id)
-
 	subject := model.NewSubjectFromRepository(
-		model.SubjectId(subjectId),
+		id,
 		utils.ConvertNilToZeroValue(subjectDTO.Category),
 		utils.ConvertNilToZeroValue(subjectDTO.Title),
 		videoIds,
