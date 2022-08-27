@@ -1,8 +1,11 @@
 package interactor
 
 import (
+	"fmt"
+
 	"github.com/kafugen/ocwcentral/domain/repository"
 	"github.com/kafugen/ocwcentral/domain/usecase/dto"
+	"github.com/kafugen/ocwcentral/model"
 )
 
 type ResourceInteractor struct {
@@ -14,5 +17,29 @@ func NewResourceInteractor(sR repository.ResourceRepository) ResourceInteractor 
 }
 
 func (sI ResourceInteractor) GetByIds(ids []string) ([]*dto.ResourceDTO, error) {
-	panic("not implemented")
+	resourceIds := make([]model.ResourceId, len(ids))
+	for i, id := range ids {
+		resourceId, err := model.NewResourceId(id)
+		resourceIds[i] = *resourceId
+		if err != nil {
+			return nil, fmt.Errorf("failed on create `ResourceId` struct: %w", err)
+		}
+	}
+
+	resources, err := sI.sR.GetByIds(resourceIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` of ResourceRepository: %w", err)
+	}
+
+	resourceDTOs := make([]*dto.ResourceDTO, len(resources))
+	for i, resource := range resources {
+		resourceDTOs[i] = &dto.ResourceDTO{
+			ID:          resource.Id().String(),
+			Title:       resource.Title(),
+			Ordering:    resource.Ordering(),
+			Description: resource.Description(),
+			Link:        resource.Link(),
+		}
+	}
+	return resourceDTOs, nil
 }
