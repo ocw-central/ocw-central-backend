@@ -1,0 +1,51 @@
+version: "3.7"
+
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: ./docker/server/Dockerfile
+    depends_on:
+      - db
+      - migrate
+    ports:
+      - ${SERVER_HOST_PORT}:8080
+    volumes:
+      - ./docker/server:/var/lib/server
+    environment:
+      WAIT_HOSTS: db:3306
+      TZ: Asia/Tokyo
+      PORT: 8080
+      MYSQL_ADDR: db:3306
+      MYSQL_USER: ${MYSQL_CONTAINER_USER}
+      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_DATABASE: ocw-central
+      APP_ENV: ${APP_ENV}
+  migrate:
+    build:
+      context: ./
+      dockerfile: ./docker/migrate/Dockerfile
+    depends_on:
+      - db
+    command: ["up"]
+    environment:
+      WAIT_HOSTS: db:3306
+      MIGRATIONS_DIR: /migrations
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_CONTAINER_USER}
+      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_DATABASE: ocw-central
+    volumes:
+      - ./migrations:/migrations
+  db:
+    image: mysql:8.0.30
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - ${MYSQL_HOST_PORT}:3306
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_CONTAINER_ALLOW_EMPTY_PASSWORD}
+      MYSQL_DATABASE: ocw-central

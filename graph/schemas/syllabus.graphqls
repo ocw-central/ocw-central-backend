@@ -1,0 +1,22 @@
+type Syllabus implements Node {
+  id: ID!
+  faculty: String!
+  language: String!
+  subjectNumbering: String!
+  academicYear: Int!
+  semester: String!
+  numCredit: Int!
+  courceFormat: String!
+  assignedGrade: String!
+  targetedAudience: String!
+  courceDayPeriod: String!
+  outline: String!
+  objective: String!
+  lessonPlan: String!
+  gradingMethod: String!
+  courceRequirement: String!
+  outClassLearning: String!
+  reference: String!
+  remark: String!
+  subpages: [Subpage!]!
+}

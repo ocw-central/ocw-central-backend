@@ -1,0 +1,18 @@
+type Subject implements Node {
+  id: ID!
+  category: String!
+  title: String!
+  videos: [Video!]!
+  location: String!
+  resources: [Resource!]!
+  relatedSubjects: [RelatedSubject!]!
+  department: String!
+  firstHeldOn: Time!
+  faculty: String!
+  language: String!
+  freeDescription: String!
+  syllabus: Syllabus!
+  series: String!
+  academicField: String!
+  thumbnailLink: String!
+}

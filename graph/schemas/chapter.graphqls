@@ -1,0 +1,6 @@
+type Chapter implements Node {
+  id: ID!
+  startAt: Int!
+  topic: String!
+  thumbnailLink: String!
+}
