@@ -23,7 +23,8 @@ go.work
 .env
 discussion
 
-docker/mysql
+docker/mysql/data
 
 private/
 .vscode/
+.DS_Store
