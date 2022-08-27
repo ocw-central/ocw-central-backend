@@ -52,41 +52,61 @@ func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, err
 	}
 
 	videos := make([]*model.Video, len(ids))
-
 	rowIndex := 0
-	for ordering, videoId := range ids {
-		chapters := make([]model.Chapter, 0, 10)
-		for rowIndex < len(videoChapterDTOs) && ordering == *videoChapterDTOs[rowIndex].Ordering {
-			videoChapterDTO := videoChapterDTOs[rowIndex]
+	for ordering := 0; ordering < len(ids); ordering++ {
+		videoChapterDTO := videoChapterDTOs[rowIndex]
 
-			if videoChapterDTO.ChapterId != nil {
-				chapterId, err := model.NewChapterId(*videoChapterDTO.ChapterId)
-				if err != nil {
-					return nil, fmt.Errorf("failed to create `chapterId`: %w", err)
-				}
+		chapters, err := getChaptersByOrdering(ordering, videoChapterDTOs[rowIndex:])
+		if err != nil {
+			return nil, fmt.Errorf("failed to get chapters (rowIndex: %v, ordering: %v): %w", rowIndex, ordering, err)
+		}
 
-				chapters = append(chapters, *model.NewChapterFromRepository(
-					*chapterId,
-					*videoChapterDTO.StartAt,
-					*videoChapterDTO.Topic,
-					*videoChapterDTO.ThumbnailLink,
-				))
-			}
-
-			rowIndex++
+		videoId, err := model.NewVideoId(*videoChapterDTO.Id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create `videoId`: %w", err)
 		}
 
 		videos[ordering] = model.NewVideoFromRepository(
-			videoId,
-			*videoChapterDTOs[ordering].Title,
-			*videoChapterDTOs[ordering].Ordering,
-			*videoChapterDTOs[ordering].Link,
+			*videoId,
+			*videoChapterDTO.Title,
+			*videoChapterDTO.Ordering,
+			*videoChapterDTO.Link,
 			chapters,
-			utils.ConvertNilToZeroValue(videoChapterDTOs[ordering].Faculty),
-			utils.ConvertNilToZeroValue(videoChapterDTOs[ordering].LecturedOn),
-			time.Duration(*videoChapterDTOs[ordering].VideoLength*int(time.Second)),
-			utils.ConvertNilToZeroValue(videoChapterDTOs[ordering].Language),
+			utils.ConvertNilToZeroValue(videoChapterDTO.Faculty),
+			utils.ConvertNilToZeroValue(videoChapterDTO.LecturedOn),
+			time.Duration(*videoChapterDTO.VideoLength*int(time.Second)),
+			utils.ConvertNilToZeroValue(videoChapterDTO.Language),
 		)
+
+		rowIndex += len(chapters)
 	}
 	return videos, nil
+}
+
+// getChaptersByOrdering returns chapters of the video with the given ordering.
+func getChaptersByOrdering(ordering int, videoChapterDTOs []dto.VideoChapterDTO) ([]model.Chapter, error) {
+	rowIndex := 0
+
+	// the number of chapter is exptected to be smaller than 10.
+	chapters := make([]model.Chapter, 0, 10)
+	for rowIndex < len(videoChapterDTOs) && ordering == *videoChapterDTOs[rowIndex].Ordering {
+		videoChapterDTO := videoChapterDTOs[rowIndex]
+
+		if videoChapterDTO.ChapterId != nil {
+			chapterId, err := model.NewChapterId(*videoChapterDTO.ChapterId)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create `chapterId`: %w", err)
+			}
+
+			chapters = append(chapters, *model.NewChapterFromRepository(
+				*chapterId,
+				*videoChapterDTO.StartAt,
+				*videoChapterDTO.Topic,
+				*videoChapterDTO.ThumbnailLink,
+			))
+		}
+
+		rowIndex++
+	}
+	return chapters, nil
 }

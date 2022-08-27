@@ -1,6 +1,7 @@
 type Video implements Node {
   id: ID!
   title: String!
+  ordering: Int!
   link: String!
   chapters: [Chapter!]!
   faculty: String!
