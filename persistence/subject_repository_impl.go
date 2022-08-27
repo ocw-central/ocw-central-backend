@@ -132,6 +132,15 @@ func (sR SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, err
 	return subject, nil
 }
 
-func (sR SubjectRepositoryImpl) GetByIds(id []model.SubjectId) ([]*model.Subject, error) {
-	panic("not implemented")
+func (sR SubjectRepositoryImpl) GetByIds(ids []model.SubjectId) ([]*model.Subject, error) {
+	// FIXME: this causes N+1 query problem
+	subjects := make([]*model.Subject, len(ids))
+	for i, id := range ids {
+		subject, err := sR.GetById(id)
+		if err != nil {
+			return nil, err
+		}
+		subjects[i] = subject
+	}
+	return subjects, nil
 }

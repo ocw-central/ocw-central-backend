@@ -6,4 +6,5 @@ import (
 
 type SubjectUsecase interface {
 	GetById(id string) (*dto.SubjectDTO, error)
+	GetByIds(ids []string) ([]*dto.SubjectDTO, error)
 }
