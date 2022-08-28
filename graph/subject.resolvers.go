@@ -46,7 +46,17 @@ func (r *subjectResolver) Resources(ctx context.Context, obj *model.Subject) ([]
 
 // RelatedSubjects is the resolver for the relatedSubjects field.
 func (r *subjectResolver) RelatedSubjects(ctx context.Context, obj *model.Subject) ([]*model.RelatedSubject, error) {
-	panic(fmt.Errorf("not implemented: RelatedSubjects - relatedSubjects"))
+	subjects, err := r.sbU.GetByIds(obj.RelatedSubjectIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetById` func of SubjectUsecase: %w", err)
+	}
+
+	relatedSubjects := make([]*model.RelatedSubject, len(subjects))
+	for i, subject := range subjects {
+		relatedSubject := model.RelatedSubject(*subject)
+		relatedSubjects[i] = &relatedSubject
+	}
+	return relatedSubjects, nil
 }
 
 // Syllabus is the resolver for the syllabus field.

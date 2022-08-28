@@ -27,6 +27,32 @@ func (sI SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 		return nil, fmt.Errorf("failed on executing `GetById` of SubjectRepository: %w", err)
 	}
 
+	return convertModelToDTO(subject), nil
+}
+
+func (sI SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
+	subjectIds := make([]model.SubjectId, len(ids))
+	for i, id := range ids {
+		subjectId, err := model.NewSubjectId(id)
+		if err != nil {
+			return nil, fmt.Errorf("failed on create `SubjectId`: %w", err)
+		}
+		subjectIds[i] = *subjectId
+	}
+
+	subjects, err := sI.sR.GetByIds(subjectIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` of SubjectRepository: %w", err)
+	}
+
+	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
+	for i, subject := range subjects {
+		subjectDTOs[i] = convertModelToDTO(subject)
+	}
+	return subjectDTOs, nil
+}
+
+func convertModelToDTO(subject *model.Subject) *dto.SubjectDTO {
 	videoIds := subject.VideoIds()
 	videoIdStrs := make([]string, len(videoIds))
 	for i, videoId := range videoIds {
@@ -50,7 +76,7 @@ func (sI SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 		syllabusId = subject.SyllabusId().String()
 	}
 
-	subjectDTO := dto.SubjectDTO{
+	return &dto.SubjectDTO{
 		ID:                subject.Id().String(),
 		Category:          subject.Category(),
 		Title:             subject.Title(),
@@ -67,5 +93,4 @@ func (sI SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 		Series:            subject.Series(),
 		AcademicField:     subject.AcademicField(),
 	}
-	return &subjectDTO, nil
 }
