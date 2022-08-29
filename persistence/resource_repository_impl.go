@@ -24,8 +24,9 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 		resourceIdBytes[i] = id.ByteSlice()
 	}
 
+	resources := make([]*model.Resource, len(ids))
 	if len(ids) == 0 {
-		return nil, nil
+		return resources, nil
 	}
 
 	resourceSQL := `
@@ -43,8 +44,6 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 	if err := vR.db.Select(&resourceDTOs, resourceSQL, resourceIdBytes...); err != nil {
 		return nil, fmt.Errorf("failed on select to `resources` table: %w", err)
 	}
-
-	resources := make([]*model.Resource, len(ids))
 
 	for rowIndex := 0; rowIndex < len(ids); rowIndex++ {
 		resourceDTO := resourceDTOs[rowIndex]
@@ -64,34 +63,4 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 		)
 	}
 	return resources, nil
-}
-
-func (vR ResourceRepositoryImpl) GetById(id model.ResourceId) (*model.Resource, error) {
-	resourceSQL := `
-		SELECT
-			resources.id,
-			title,
-			description,
-			ordering,
-			link
-		FROM resources
-		WHERE resources.id = ?
-`
-	var resourceDTO dto.ResourceDTO
-	if err := vR.db.Get(&resourceDTO, resourceSQL, id.ByteSlice()); err != nil {
-		return nil, fmt.Errorf("failed on select to `resources` table: %w", err)
-	}
-
-	resourceId, err := model.NewResourceId(*resourceDTO.Id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create `resourceId`: %w", err)
-	}
-
-	return model.NewResourceFromRepository(
-		*resourceId,
-		utils.ConvertNilToZeroValue(resourceDTO.Title),
-		*resourceDTO.Ordering,
-		utils.ConvertNilToZeroValue(resourceDTO.Description),
-		utils.ConvertNilToZeroValue(resourceDTO.Link),
-	), nil
 }
