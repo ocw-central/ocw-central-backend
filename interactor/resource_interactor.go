@@ -17,6 +17,10 @@ func NewResourceInteractor(sR repository.ResourceRepository) ResourceInteractor 
 }
 
 func (sI ResourceInteractor) GetByIds(ids []string) ([]*dto.ResourceDTO, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
 	resourceIds := make([]model.ResourceId, len(ids))
 	for i, id := range ids {
 		resourceId, err := model.NewResourceId(id)

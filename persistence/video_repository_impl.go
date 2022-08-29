@@ -20,15 +20,13 @@ func NewVideoRepositoryImpl(db *sqlx.DB) VideoRepositoryImpl {
 }
 
 func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
 	videoIdBytes := make([]interface{}, len(ids))
 	for i, id := range ids {
 		videoIdBytes[i] = id.ByteSlice()
-	}
-
-	videos := make([]*model.Video, len(ids))
-
-	if len(ids) == 0 {
-		return videos, nil
 	}
 
 	videoSQL := `
@@ -58,6 +56,7 @@ func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, err
 	}
 
 	rowIndex := 0
+	videos := make([]*model.Video, len(ids))
 	for ordering := 0; ordering < len(ids); ordering++ {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
 

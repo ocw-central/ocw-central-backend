@@ -19,14 +19,13 @@ func NewResourceRepositoryImpl(db *sqlx.DB) ResourceRepositoryImpl {
 }
 
 func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Resource, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
 	resourceIdBytes := make([]interface{}, len(ids))
 	for i, id := range ids {
 		resourceIdBytes[i] = id.ByteSlice()
-	}
-
-	resources := make([]*model.Resource, len(ids))
-	if len(ids) == 0 {
-		return resources, nil
 	}
 
 	resourceSQL := `
@@ -46,6 +45,7 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 		return nil, fmt.Errorf("failed on select to `resources` table: %w", err)
 	}
 
+	resources := make([]*model.Resource, len(ids))
 	for rowIndex := 0; rowIndex < len(ids); rowIndex++ {
 		resourceDTO := resourceDTOs[rowIndex]
 
