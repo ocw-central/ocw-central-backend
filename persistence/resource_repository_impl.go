@@ -38,7 +38,8 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 			link
 		FROM resources
 		WHERE resources.id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
-`
+		ORDER BY ordering
+	`
 
 	var resourceDTOs []dto.ResourceDTO
 	if err := vR.db.Select(&resourceDTOs, resourceSQL, resourceIdBytes...); err != nil {
@@ -54,7 +55,6 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 		}
 
 		resources[rowIndex] = model.NewResourceFromRepository(
-
 			*resourceId,
 			utils.ConvertNilToZeroValue(resourceDTO.Title),
 			*resourceDTO.Ordering,
