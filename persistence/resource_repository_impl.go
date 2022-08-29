@@ -25,14 +25,14 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 	}
 	resourceSQL := `
         SELECT
-            resources.id
-            subject_id
-            title
-            description
-            ordering
+            resources.id,
+            subject_id,
+            title,
+            description,
+            ordering,
             link
         FROM resources
-        WHERE id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
+#        WHERE resources.id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
 `
 
 	var resourceDTOs []dto.ResourceDTO
@@ -60,4 +60,35 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 		)
 	}
 	return resources, nil
+}
+
+func (vR ResourceRepositoryImpl) GetById(id model.ResourceId) (*model.Resource, error) {
+	resourceSQL := `
+		SELECT
+			resources.id,
+			subject_id,
+			title,
+			description,
+			ordering,
+			link
+		FROM resources
+		WHERE resources.id = ?
+`
+	var resourceDTO dto.ResourceDTO
+	if err := vR.db.Get(&resourceDTO, resourceSQL, id.ByteSlice()); err != nil {
+		return nil, fmt.Errorf("failed on select to `resources` table: %w", err)
+	}
+
+	resourceId, err := model.NewResourceId(*resourceDTO.Id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create `resourceId`: %w", err)
+	}
+
+	return model.NewResourceFromRepository(
+		*resourceId,
+		utils.ConvertNilToZeroValue(resourceDTO.Title),
+		*resourceDTO.Ordering,
+		utils.ConvertNilToZeroValue(resourceDTO.Description),
+		utils.ConvertNilToZeroValue(resourceDTO.Link),
+	), nil
 }

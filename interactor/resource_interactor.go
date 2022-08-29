@@ -43,3 +43,24 @@ func (sI ResourceInteractor) GetByIds(ids []string) ([]*dto.ResourceDTO, error) 
 	}
 	return resourceDTOs, nil
 }
+
+func (sI ResourceInteractor) GetById(id string) (*dto.ResourceDTO, error) {
+	resourceId, err := model.NewResourceId(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed on create `ResourceId` struct: %w", err)
+	}
+
+	resource, err := sI.sR.GetById(*resourceId)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetById` of ResourceRepository: %w", err)
+	}
+
+	resourceDTO := &dto.ResourceDTO{
+		ID:          resource.Id().String(),
+		Title:       resource.Title(),
+		Ordering:    resource.Ordering(),
+		Description: resource.Description(),
+		Link:        resource.Link(),
+	}
+	return resourceDTO, nil
+}
