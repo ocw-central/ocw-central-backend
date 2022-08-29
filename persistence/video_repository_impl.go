@@ -25,6 +25,12 @@ func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, err
 		videoIdBytes[i] = id.ByteSlice()
 	}
 
+	videos := make([]*model.Video, len(ids))
+
+	if len(ids) == 0 {
+		return videos, nil
+	}
+
 	videoSQL := `
 		SELECT
 			videos.id,
@@ -51,7 +57,6 @@ func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, err
 		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
 	}
 
-	videos := make([]*model.Video, len(ids))
 	rowIndex := 0
 	for ordering := 0; ordering < len(ids); ordering++ {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
