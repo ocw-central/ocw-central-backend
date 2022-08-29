@@ -23,16 +23,20 @@ func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Reso
 	for i, id := range ids {
 		resourceIdBytes[i] = id.ByteSlice()
 	}
+
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
 	resourceSQL := `
-        SELECT
-            resources.id,
-            subject_id,
-            title,
-            description,
-            ordering,
-            link
-        FROM resources
-#        WHERE resources.id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
+		SELECT
+			resources.id,
+			title,
+			description,
+			ordering,
+			link
+		FROM resources
+		WHERE resources.id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
 `
 
 	var resourceDTOs []dto.ResourceDTO
@@ -66,7 +70,6 @@ func (vR ResourceRepositoryImpl) GetById(id model.ResourceId) (*model.Resource, 
 	resourceSQL := `
 		SELECT
 			resources.id,
-			subject_id,
 			title,
 			description,
 			ordering,
