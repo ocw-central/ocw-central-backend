@@ -21,10 +21,27 @@ func (s ResourceId) String() string {
 	return ulid.ULID(s).String()
 }
 
+func (s ResourceId) ByteSlice() []byte {
+	bytes := [16]byte(s)
+	return bytes[:]
+}
+
 type Resource struct {
 	id          ResourceId `desc:"ID"`
 	title       string     `desc:"名前"`
 	ordering    int        `desc:"表示順"`
 	description string     `desc:"説明"`
 	link        string     `desc:"リソースリンク"`
+}
+
+func NewResourceFromRepository(
+	id ResourceId,
+	title string,
+	ordering int,
+	description string,
+	link string,
+) *Resource {
+	return &Resource{
+		id, title, ordering, description, link,
+	}
 }

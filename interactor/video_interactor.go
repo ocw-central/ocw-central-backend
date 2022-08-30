@@ -17,6 +17,10 @@ func NewVideoInteractor(sR repository.VideoRepository) VideoInteractor {
 }
 
 func (sI VideoInteractor) GetByIds(ids []string) ([]*dto.VideoDTO, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
 	videoIds := make([]model.VideoId, len(ids))
 	for i, id := range ids {
 		videoId, err := model.NewVideoId(id)
