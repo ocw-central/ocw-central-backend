@@ -20,6 +20,11 @@ func (s SyllabusId) String() string {
 	return ulid.ULID(s).String()
 }
 
+func (s SyllabusId) ByteSlice() []byte {
+	bytes := [16]byte(s)
+	return bytes[:]
+}
+
 type Syllabus struct {
 	id                SyllabusId  `desc:"ID"`
 	faculty           string      `desc:"教員の氏名と所属職位"`
