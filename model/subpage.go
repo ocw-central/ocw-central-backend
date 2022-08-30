@@ -23,5 +23,5 @@ func (s SubpageId) String() string {
 
 type Subpage struct {
 	id      SubpageId `desc:"ID"`
-	content string    `desc:"内容テキスト"`
+	content string    `desc:"ページ内容"`
 }
