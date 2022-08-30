@@ -20,11 +20,6 @@ func (s SyllabusId) String() string {
 	return ulid.ULID(s).String()
 }
 
-func (s SyllabusId) ByteSlice() []byte {
-	bytes := [16]byte(s)
-	return bytes[:]
-}
-
 type Syllabus struct {
 	id                SyllabusId  `desc:"ID"`
 	faculty           string      `desc:"教員の氏名と所属職位"`
@@ -46,34 +41,4 @@ type Syllabus struct {
 	reference         string      `desc:"教科書・参考書等"`
 	remark            string      `desc:"備考"`
 	subpageIds        []SubpageId `desc:"サブページIDs"`
-}
-
-func NewSyllabusFromRepository(
-	id SyllabusId,
-	faculty string,
-	language string,
-	subjectNumbering string,
-	academicYear int16,
-	semester string,
-	numCredit int8,
-	courceFormat string,
-	assignedGrade string,
-	targetedAudience string,
-	courceDayPeriod string,
-	outline string,
-	objective string,
-	lessonPlan string,
-	gradingMethod string,
-	courceRequirement string,
-	outClassLearning string,
-	reference string,
-	remark string,
-	subpageIds []SubpageId,
-) *Syllabus {
-	return &Syllabus{
-		id, faculty, language, subjectNumbering, academicYear, semester, numCredit,
-		courceFormat, assignedGrade, targetedAudience, courceDayPeriod, outline,
-		objective, lessonPlan, gradingMethod, courceRequirement, outClassLearning,
-		reference, remark, subpageIds,
-	}
 }
