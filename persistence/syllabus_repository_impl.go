@@ -1,7 +1,6 @@
 package persistence
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -19,10 +18,16 @@ func NewSyllabusRepositoryImpl(db *sqlx.DB) SyllabusRepositoryImpl {
 	return SyllabusRepositoryImpl{db}
 }
 
-func (sR SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, error) {
-	syllabusIdBytes := id.ByteSlice()
+func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syllabus, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
 
-	syllabusDTO := dto.SyllabusDTO{}
+	syllabusIdBytes := make([]interface{}, len(ids))
+	for i, id := range ids {
+		syllabusIdBytes[i] = id.ByteSlice()
+	}
+
 	syllabusSQL := `
 		SELECT
 			syllabuses.id,
@@ -47,51 +52,65 @@ func (sR SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, 
 			remark,
 			subpages.id AS subpages_id,
 			link
+			content
 		FROM syllabuses
 		LEFT JOIN subpages 
 		ON syllabuses.subjevt_id = subpages.subject_id
-		WHERE syllabuses.id = ?
+		WHERE syllabuses.id = (` + utils.GetQuestionMarkStrs(len(ids)) + `)
 	`
+
 	var syllabusSubpageDTOs []dto.SyllabusSubpageDTO
 	if err := sR.db.Select(&syllabusSubpageDTOs, syllabusSQL, syllabusIdBytes); err != nil {
 		return nil, fmt.Errorf("failed on select to `syllabuses` table: %w", err)
 	}
 
-	if err := sR.db.Get(&syllabusDTO, syllabusSQL, syllabusIdBytes); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("specified syllabus not found: %w", err)
+	syllabuses := make([]*model.Syllabus, len(ids))
+	for i, syllabusSubpageDTO := range syllabusSubpageDTOs {
+
+		if syllabusSubpageDTO.SubpageId != nil {
+
+			subpages := make([]model.Subpage, len(syllabusSubpageDTO.SubpageId))
+			for subpageIndex := 0; subpageIndex < len(syllabusSubpageDTO.SubpageId); subpageIndex++ {
+
+				subpageId, err := model.NewSubpageId(*syllabusSubpageDTO.SubpageId)
+				if err != nil {
+					return nil, fmt.Errorf("failed on creating subpageId: %w", err)
+				}
+
+				subpages[subpageIndex] = *model.NewSubpageFromRepository(
+					*subpageId,
+					utils.ConvertNilToZeroValue(syllabusSubpageDTO.Content),
+				)
+			}
+
+			syllabusId, err := model.NewSyllabusId(*syllabusSubpageDTO.Id)
+			if err != nil {
+				return nil, fmt.Errorf("failed on creating syllabusId: %w", err)
+			}
+
+			syllabuses[i] = model.NewSyllabusFromRepository(
+				*syllabusId,
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Faculty),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Language),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.SubjectNumbering),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.AcademicYear),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Semester),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.NumCredit),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseFormat),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.AssignedGrade),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.TargettedAudience),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseDayPeriod),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Outline),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Objective),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.LessonPlan),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.GradingMethod),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseRequirement),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.OutclassLearning),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Reference),
+				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Remark),
+				subpages,
+			)
 		}
-		return nil, fmt.Errorf("failed on select to `syllabuses` table: %w", err)
 	}
-
-	syllabusId := *(*[16]byte)(*syllabusDTO.Id)
-
-	syllabus := model.NewSyllabusFromRepository(
-		model.SyllabusId(syllabusId),
-		utils.ConvertNilToZeroValue(syllabusDTO.Faculty),
-		utils.ConvertNilToZeroValue(syllabusDTO.Language),
-		utils.ConvertNilToZeroValue(syllabusDTO.SubjectNumbering),
-		utils.ConvertNilToZeroValue(syllabusDTO.AcademicYear),
-		utils.ConvertNilToZeroValue(syllabusDTO.Semester),
-		utils.ConvertNilToZeroValue(syllabusDTO.NumCredit),
-		utils.ConvertNilToZeroValue(syllabusDTO.CourseFormat),
-		utils.ConvertNilToZeroValue(syllabusDTO.AssignedGrade),
-		utils.ConvertNilToZeroValue(syllabusDTO.TargettedAudience),
-		utils.ConvertNilToZeroValue(syllabusDTO.CourseDayPeriod),
-		utils.ConvertNilToZeroValue(syllabusDTO.Outline),
-		utils.ConvertNilToZeroValue(syllabusDTO.Objective),
-		utils.ConvertNilToZeroValue(syllabusDTO.LessonPlan),
-		utils.ConvertNilToZeroValue(syllabusDTO.GradingMethod),
-		utils.ConvertNilToZeroValue(syllabusDTO.CourseRequirement),
-		utils.ConvertNilToZeroValue(syllabusDTO.OutclassLearning),
-		utils.ConvertNilToZeroValue(syllabusDTO.Reference),
-		utils.ConvertNilToZeroValue(syllabusDTO.Remark),
-		subpageIds,
-	)
-
-	return syllabus, nil
-}
-
-func (sR SubjectRepositoryImpl) GetByIds(id []model.SyllabusId) ([]*model.Syllabus, error) {
-	panic("not implemented")
+	return syllabuses, nil
 }

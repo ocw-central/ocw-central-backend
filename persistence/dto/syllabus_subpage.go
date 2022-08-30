@@ -20,5 +20,6 @@ type SyllabusSubpageDTO struct {
 	OutclassLearning  *string `db:"outclass_learning"`
 	Reference         *string `db:"reference"`
 	Remark            *string `db:"remark"`
-	subpageIds        *[]byte `db:"subpage_ids"`
+	SubpageId         *[]byte `db:"subpage_ids"`
+	Content           *string `db:"content"`
 }

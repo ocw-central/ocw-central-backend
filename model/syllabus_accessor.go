@@ -57,6 +57,6 @@ func (s *Syllabus) Reference() string {
 func (s *Syllabus) Remark() string {
 	return s.remark
 }
-func (s *Syllabus) SubpageIds() []SubpageId {
-	return s.subpageIds
+func (s *Syllabus) SubpageIds() []Subpage {
+	return s.subpages
 }
