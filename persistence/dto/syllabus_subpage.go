@@ -5,7 +5,7 @@ type SyllabusSubpageDTO struct {
 	Faculty           *string `db:"faculty"`
 	Language          *string `db:"language"`
 	SubjectNumbering  *string `db:"subject_numbering"`
-	AcademicYear      *string `db:"academic_year"`
+	AcademicYear      *int16  `db:"academic_year"`
 	Semester          *string `db:"semester"`
 	NumCredit         *int8   `db:"num_credit"`
 	CourseFormat      *string `db:"course_format"`
@@ -20,6 +20,6 @@ type SyllabusSubpageDTO struct {
 	OutclassLearning  *string `db:"outclass_learning"`
 	Reference         *string `db:"reference"`
 	Remark            *string `db:"remark"`
-	SubpageId         *[]byte `db:"subpage_ids"`
+	SubpageId         *[]byte `db:"subpage_id"`
 	Content           *string `db:"content"`
 }
