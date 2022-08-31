@@ -100,32 +100,34 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Remark),
 			subpages,
 		)
+
+		rowIndex += len(subpages)
 	}
 	return syllabuses, nil
 }
 
-// returns a list of subpages with the same subjectId
-func getSubpages(SyllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage, error) {
+// returns a list of subpages with the same syllabusId
+func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage, error) {
 
-	if SyllabusSubpageDTOs[0].SubpageId == nil {
+	if syllabusSubpageDTOs[0].SubpageId == nil {
 		return nil, nil
 	}
 
-	subjectId := SyllabusSubpageDTOs[0].SubjectId
 	rowIndex := 0
 
 	// number of subpages is expected to be less than 10
 	subpages := make([]model.Subpage, 0, 10)
-	for rowIndex < len(SyllabusSubpageDTOs) && subjectId == *SyllabusSubpageDTOs[rowIndex].SubjectId {
-		subpageId, err := model.NewSubpageId(*syllabusSubpageDTO.SubpagesId)
+	for rowIndex < len(syllabusSubpageDTOs) && syllabusSubpageDTOs[0].Id == syllabusSubpageDTOs[rowIndex].Id {
+		subpageId, err := model.NewSubpageId(*syllabusSubpageDTOs[rowIndex].SubpageId)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create `subpageId`: %w", err)
 		}
-		subpages[i] = model.NewSubpageFromRepository(
+
+		subpages = append(subpages, *model.NewSubpageFromRepository(
 			*subpageId,
-			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Link),
-			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Content),
-		)
+			utils.ConvertNilToZeroValue(syllabusSubpageDTOs[rowIndex].Content),
+		))
+		rowIndex++
 	}
 	return subpages, nil
 }

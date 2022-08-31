@@ -21,7 +21,7 @@ func (s *Syllabus) Semester() string {
 func (s *Syllabus) NumCredit() int8 {
 	return s.numCredit
 }
-func (s *Syllabus) CourceFormat() string {
+func (s *Syllabus) CourseFormat() string {
 	return s.courceFormat
 }
 func (s *Syllabus) AssignedGrade() string {
@@ -30,7 +30,7 @@ func (s *Syllabus) AssignedGrade() string {
 func (s *Syllabus) TargetedAudience() string {
 	return s.targetedAudience
 }
-func (s *Syllabus) CourceDayPeriod() string {
+func (s *Syllabus) CourseDayPeriod() string {
 	return s.courceDayPeriod
 }
 func (s *Syllabus) Outline() string {
@@ -45,7 +45,7 @@ func (s *Syllabus) LessonPlan() string {
 func (s *Syllabus) GradingMethod() string {
 	return s.gradingMethod
 }
-func (s *Syllabus) CourceRequirement() string {
+func (s *Syllabus) CourseRequirement() string {
 	return s.courceRequirement
 }
 func (s *Syllabus) OutClassLearning() string {
@@ -57,6 +57,6 @@ func (s *Syllabus) Reference() string {
 func (s *Syllabus) Remark() string {
 	return s.remark
 }
-func (s *Syllabus) SubpageIds() []Subpage {
+func (s *Syllabus) Subpages() []Subpage {
 	return s.subpages
 }
