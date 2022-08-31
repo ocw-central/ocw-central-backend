@@ -131,3 +131,11 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 	}
 	return subpages, nil
 }
+
+func (sR SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, error) {
+	syllabuses, err := sR.GetByIds([]model.SyllabusId{id})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get syllabus (id: %v): %w", id, err)
+	}
+	return syllabuses[0], nil
+}

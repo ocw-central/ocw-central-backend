@@ -6,4 +6,5 @@ import (
 
 type SyllabusRepository interface {
 	GetById(id model.SyllabusId) (*model.Syllabus, error)
+	GetByIds(ids []model.SyllabusId) ([]*model.Syllabus, error)
 }

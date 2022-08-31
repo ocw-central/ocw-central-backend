@@ -39,45 +39,6 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 	return videos, nil
 }
 
-// Syllabuses is the resolver for the syllabuses filed.
-func (r *subjectResolver) Syllabuses(ctx context.Context, obj *model.Subject) ([]*model.Syllabus, error) {
-	syllabusDTOs, err := r.rU.GetByIds(obj.SyllabusIds)
-	if err != nil {
-		return nil, fmt.Errorf("failed on executing `GetByIds` func of SyllabusUsecase: %w", err)
-	}
-
-	syllabuses := make([]*model.Syllabus, len(syllabusDTOs))
-	for i, syllabusDTO := range syllabusDTOs {
-		subpages := make([]model.Subpage, len(syllabusDTO.Subpages))
-		for j, subpage := range syllabusDTO.Subpages {
-			subpages[j] = model.Subpage(subpage)
-		}
-		syllabuses[i] = &model.Syllabus{
-			ID:                syllabusDTO.ID,
-			Faculty:           syllabusDTO.Faculty,
-			Language:          syllabusDTO.Language,
-			SubjectNumbering:  syllabusDTO.SubjectNumbering,
-			AcademicYear:      syllabusDTO.AcademicYear,
-			Semester:          syllabusDTO.Semester,
-			NumCredit:         syllabusDTO.NumCredit,
-			CourceFormat:      syllabusDTO.CourceFormat,
-			AssignedGrade:     syllabusDTO.AssignedGrade,
-			TargetedAudience:  syllabusDTO.TargetedAudience,
-			CourceDayPeriod:   syllabusDTO.CourceDayPeriod,
-			Outline:           syllabusDTO.Outline,
-			Objective:         syllabusDTO.Objective,
-			LessonPlan:        syllabusDTO.LessonPlan,
-			GradingMethod:     syllabusDTO.GradingMethod,
-			CourceRequirement: syllabusDTO.CourceRequirement,
-			OutClassLearning:  syllabusDTO.OutClassLearning,
-			Reference:         syllabusDTO.Reference,
-			Remark:            syllabusDTO.Remark,
-			Subpages:          subpages,
-		}
-	}
-	return syllabuses, nil
-}
-
 // Resources is the resolver for the resources field.
 func (r *subjectResolver) Resources(ctx context.Context, obj *model.Subject) ([]*model.Resource, error) {
 	resouceDTOs, err := r.rU.GetByIds(obj.ResourceIds)
@@ -115,7 +76,41 @@ func (r *subjectResolver) RelatedSubjects(ctx context.Context, obj *model.Subjec
 
 // Syllabus is the resolver for the syllabus field.
 func (r *subjectResolver) Syllabus(ctx context.Context, obj *model.Subject) (*model.Syllabus, error) {
-	panic(fmt.Errorf("not implemented: Syllabus - syllabus"))
+
+	syllabusDTO, err := r.rU.GetById(obj.SyllabusId)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` func of SyllabusUsecase: %w", err)
+	}
+
+	syllabus := *model.Syllabus
+	subpages := make([]model.Subpage, len(syllabusDTO.Subpages))
+	for i, subpage := range syllabusDTO.Subpages {
+		subpages[i] = model.Subpage(subpage)
+	}
+	syllabus = &model.Syllabus{
+		ID:                syllabusDTO.ID,
+		Faculty:           syllabusDTO.Faculty,
+		Language:          syllabusDTO.Language,
+		SubjectNumbering:  syllabusDTO.SubjectNumbering,
+		AcademicYear:      syllabusDTO.AcademicYear,
+		Semester:          syllabusDTO.Semester,
+		NumCredit:         syllabusDTO.NumCredit,
+		CourceFormat:      syllabusDTO.CourceFormat,
+		AssignedGrade:     syllabusDTO.AssignedGrade,
+		TargetedAudience:  syllabusDTO.TargetedAudience,
+		CourceDayPeriod:   syllabusDTO.CourceDayPeriod,
+		Outline:           syllabusDTO.Outline,
+		Objective:         syllabusDTO.Objective,
+		LessonPlan:        syllabusDTO.LessonPlan,
+		GradingMethod:     syllabusDTO.GradingMethod,
+		CourceRequirement: syllabusDTO.CourceRequirement,
+		OutClassLearning:  syllabusDTO.OutClassLearning,
+		Reference:         syllabusDTO.Reference,
+		Remark:            syllabusDTO.Remark,
+		Subpages:          subpages,
+	}
+
+	return syllabus, nil
 }
 
 // Subject returns generated.SubjectResolver implementation.
