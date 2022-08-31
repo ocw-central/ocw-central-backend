@@ -39,11 +39,50 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 	return videos, nil
 }
 
+// Syllabuses is the resolver for the syllabuses filed.
+func (r *subjectResolver) Syllabuses(ctx context.Context, obj *model.Subject) ([]*model.Syllabus, error) {
+	syllabusDTOs, err := r.rU.GetByIds(obj.SyllabusIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` func of SyllabusUsecase: %w", err)
+	}
+
+	syllabuses := make([]*model.Syllabus, len(syllabusDTOs))
+	for i, syllabusDTO := range syllabusDTOs {
+		subpages := make([]model.Subpage, len(syllabusDTO.Subpages))
+		for j, subpage := range syllabusDTO.Subpages {
+			subpages[j] = model.Subpage(subpage)
+		}
+		syllabuses[i] = &model.Syllabus{
+			ID:                syllabusDTO.ID,
+			Faculty:           syllabusDTO.Faculty,
+			Language:          syllabusDTO.Language,
+			SubjectNumbering:  syllabusDTO.SubjectNumbering,
+			AcademicYear:      syllabusDTO.AcademicYear,
+			Semester:          syllabusDTO.Semester,
+			NumCredit:         syllabusDTO.NumCredit,
+			CourceFormat:      syllabusDTO.CourceFormat,
+			AssignedGrade:     syllabusDTO.AssignedGrade,
+			TargetedAudience:  syllabusDTO.TargetedAudience,
+			CourceDayPeriod:   syllabusDTO.CourceDayPeriod,
+			Outline:           syllabusDTO.Outline,
+			Objective:         syllabusDTO.Objective,
+			LessonPlan:        syllabusDTO.LessonPlan,
+			GradingMethod:     syllabusDTO.GradingMethod,
+			CourceRequirement: syllabusDTO.CourceRequirement,
+			OutClassLearning:  syllabusDTO.OutClassLearning,
+			Reference:         syllabusDTO.Reference,
+			Remark:            syllabusDTO.Remark,
+			Subpages:          subpages,
+		}
+	}
+	return syllabuses, nil
+}
+
 // Resources is the resolver for the resources field.
 func (r *subjectResolver) Resources(ctx context.Context, obj *model.Subject) ([]*model.Resource, error) {
-	resouceDTOs, error := r.rU.GetByIds(obj.ResourceIds)
-	if error != nil {
-		return nil, fmt.Errorf("failed on executing `GetByIds` func of ResourceUsecase: %w", error)
+	resouceDTOs, err := r.rU.GetByIds(obj.ResourceIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` func of ResourceUsecase: %w", err)
 	}
 
 	resources := make([]*model.Resource, len(resouceDTOs))
