@@ -1,7 +1,11 @@
 FROM golang:alpine3.16 as builder
 WORKDIR /workspace
-COPY . /workspace
 
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+
+COPY ./ ./
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main server.go wire_gen.go && chmod +x ./main
 
 FROM alpine:3.15

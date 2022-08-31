@@ -41,12 +41,37 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 
 // Resources is the resolver for the resources field.
 func (r *subjectResolver) Resources(ctx context.Context, obj *model.Subject) ([]*model.Resource, error) {
-	panic(fmt.Errorf("not implemented: Resources - resources"))
+	resouceDTOs, error := r.rU.GetByIds(obj.ResourceIds)
+	if error != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` func of ResourceUsecase: %w", error)
+	}
+
+	resources := make([]*model.Resource, len(resouceDTOs))
+	for i, resouceDTO := range resouceDTOs {
+		resources[i] = &model.Resource{
+			ID:          resouceDTO.ID,
+			Title:       resouceDTO.Title,
+			Ordering:    resouceDTO.Ordering,
+			Description: resouceDTO.Description,
+			Link:        resouceDTO.Link,
+		}
+	}
+	return resources, nil
 }
 
 // RelatedSubjects is the resolver for the relatedSubjects field.
 func (r *subjectResolver) RelatedSubjects(ctx context.Context, obj *model.Subject) ([]*model.RelatedSubject, error) {
-	panic(fmt.Errorf("not implemented: RelatedSubjects - relatedSubjects"))
+	subjects, err := r.sbU.GetByIds(obj.RelatedSubjectIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetById` func of SubjectUsecase: %w", err)
+	}
+
+	relatedSubjects := make([]*model.RelatedSubject, len(subjects))
+	for i, subject := range subjects {
+		relatedSubject := model.RelatedSubject(*subject)
+		relatedSubjects[i] = &relatedSubject
+	}
+	return relatedSubjects, nil
 }
 
 // Syllabus is the resolver for the syllabus field.
