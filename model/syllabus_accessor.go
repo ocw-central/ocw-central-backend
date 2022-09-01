@@ -22,7 +22,7 @@ func (s *Syllabus) NumCredit() int8 {
 	return s.numCredit
 }
 func (s *Syllabus) CourseFormat() string {
-	return s.courceFormat
+	return s.courseFormat
 }
 func (s *Syllabus) AssignedGrade() string {
 	return s.assignedGrade
@@ -31,7 +31,7 @@ func (s *Syllabus) TargetedAudience() string {
 	return s.targetedAudience
 }
 func (s *Syllabus) CourseDayPeriod() string {
-	return s.courceDayPeriod
+	return s.courseDayPeriod
 }
 func (s *Syllabus) Outline() string {
 	return s.outline
@@ -46,7 +46,7 @@ func (s *Syllabus) GradingMethod() string {
 	return s.gradingMethod
 }
 func (s *Syllabus) CourseRequirement() string {
-	return s.courceRequirement
+	return s.courseRequirement
 }
 func (s *Syllabus) OutClassLearning() string {
 	return s.outClassLearning

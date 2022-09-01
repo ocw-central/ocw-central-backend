@@ -3,18 +3,18 @@ type Syllabus implements Node {
   faculty: String!
   language: String!
   subjectNumbering: String!
-  academicYear: Int!
+  academicYear: Int16!
   semester: String!
-  numCredit: Int!
-  courceFormat: String!
+  numCredit: Int8!
+  courseFormat: String!
   assignedGrade: String!
   targetedAudience: String!
-  courceDayPeriod: String!
+  courseDayPeriod: String!
   outline: String!
   objective: String!
   lessonPlan: String!
   gradingMethod: String!
-  courceRequirement: String!
+  courseRequirement: String!
   outClassLearning: String!
   reference: String!
   remark: String!

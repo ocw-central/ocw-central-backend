@@ -33,15 +33,15 @@ type Syllabus struct {
 	academicYear      int16      `desc:"開講年度"`
 	semester          string     `desc:"開講期"`
 	numCredit         int8       `desc:"単位数"`
-	courceFormat      string     `desc:"授業形態"`
+	courseFormat      string     `desc:"授業形態"`
 	assignedGrade     string     `desc:"配当学年"`
 	targetedAudience  string     `desc:"対象学生"`
-	courceDayPeriod   string     `desc:"曜時限"`
+	courseDayPeriod   string     `desc:"曜時限"`
 	outline           string     `desc:"授業の概要・目的"`
 	objective         string     `desc:"到達目標"`
 	lessonPlan        string     `desc:"授業計画と内容"`
 	gradingMethod     string     `desc:"成績評価の方法・観点"`
-	courceRequirement string     `desc:"履修要件"`
+	courseRequirement string     `desc:"履修要件"`
 	outClassLearning  string     `desc:"授業外学習（予習・復習）等"`
 	reference         string     `desc:"教科書・参考書等"`
 	remark            string     `desc:"備考"`
@@ -56,15 +56,15 @@ func NewSyllabusFromRepository(
 	academicYear int16,
 	semester string,
 	numCredit int8,
-	courceFormat string,
+	courseFormat string,
 	assignedGrade string,
 	targetedAudience string,
-	courceDayPeriod string,
+	courseDayPeriod string,
 	outline string,
 	objective string,
 	lessonPlan string,
 	gradingMethod string,
-	courceRequirement string,
+	courseRequirement string,
 	outClassLearning string,
 	reference string,
 	remark string,
@@ -78,15 +78,15 @@ func NewSyllabusFromRepository(
 		academicYear:      academicYear,
 		semester:          semester,
 		numCredit:         numCredit,
-		courceFormat:      courceFormat,
+		courseFormat:      courseFormat,
 		assignedGrade:     assignedGrade,
 		targetedAudience:  targetedAudience,
-		courceDayPeriod:   courceDayPeriod,
+		courseDayPeriod:   courseDayPeriod,
 		outline:           outline,
 		objective:         objective,
 		lessonPlan:        lessonPlan,
 		gradingMethod:     gradingMethod,
-		courceRequirement: courceRequirement,
+		courseRequirement: courseRequirement,
 		outClassLearning:  outClassLearning,
 		reference:         reference,
 		remark:            remark,
