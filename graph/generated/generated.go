@@ -39,6 +39,7 @@ type Config struct {
 type ResolverRoot interface {
 	Query() QueryResolver
 	Subject() SubjectResolver
+	Syllabus() SyllabusResolver
 }
 
 type DirectiveRoot struct {
@@ -111,9 +112,9 @@ type ComplexityRoot struct {
 	Syllabus struct {
 		AcademicYear      func(childComplexity int) int
 		AssignedGrade     func(childComplexity int) int
-		CourceDayPeriod   func(childComplexity int) int
-		CourceFormat      func(childComplexity int) int
-		CourceRequirement func(childComplexity int) int
+		CourseDayPeriod   func(childComplexity int) int
+		CourseFormat      func(childComplexity int) int
+		CourseRequirement func(childComplexity int) int
 		Faculty           func(childComplexity int) int
 		GradingMethod     func(childComplexity int) int
 		ID                func(childComplexity int) int
@@ -155,6 +156,11 @@ type SubjectResolver interface {
 	RelatedSubjects(ctx context.Context, obj *model.Subject) ([]*model.RelatedSubject, error)
 
 	Syllabus(ctx context.Context, obj *model.Subject) (*model.Syllabus, error)
+}
+type SyllabusResolver interface {
+	AcademicYear(ctx context.Context, obj *model.Syllabus) (int, error)
+
+	NumCredit(ctx context.Context, obj *model.Syllabus) (int, error)
 }
 
 type executableSchema struct {
@@ -511,26 +517,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Syllabus.AssignedGrade(childComplexity), true
 
-	case "Syllabus.courceDayPeriod":
-		if e.complexity.Syllabus.CourceDayPeriod == nil {
+	case "Syllabus.courseDayPeriod":
+		if e.complexity.Syllabus.CourseDayPeriod == nil {
 			break
 		}
 
-		return e.complexity.Syllabus.CourceDayPeriod(childComplexity), true
+		return e.complexity.Syllabus.CourseDayPeriod(childComplexity), true
 
-	case "Syllabus.courceFormat":
-		if e.complexity.Syllabus.CourceFormat == nil {
+	case "Syllabus.courseFormat":
+		if e.complexity.Syllabus.CourseFormat == nil {
 			break
 		}
 
-		return e.complexity.Syllabus.CourceFormat(childComplexity), true
+		return e.complexity.Syllabus.CourseFormat(childComplexity), true
 
-	case "Syllabus.courceRequirement":
-		if e.complexity.Syllabus.CourceRequirement == nil {
+	case "Syllabus.courseRequirement":
+		if e.complexity.Syllabus.CourseRequirement == nil {
 			break
 		}
 
-		return e.complexity.Syllabus.CourceRequirement(childComplexity), true
+		return e.complexity.Syllabus.CourseRequirement(childComplexity), true
 
 	case "Syllabus.faculty":
 		if e.complexity.Syllabus.Faculty == nil {
@@ -831,15 +837,15 @@ scalar Time
   academicYear: Int!
   semester: String!
   numCredit: Int!
-  courceFormat: String!
+  courseFormat: String!
   assignedGrade: String!
   targetedAudience: String!
-  courceDayPeriod: String!
+  courseDayPeriod: String!
   outline: String!
   objective: String!
   lessonPlan: String!
   gradingMethod: String!
-  courceRequirement: String!
+  courseRequirement: String!
   outClassLearning: String!
   reference: String!
   remark: String!
@@ -3011,14 +3017,14 @@ func (ec *executionContext) fieldContext_Subject_syllabus(ctx context.Context, f
 				return ec.fieldContext_Syllabus_semester(ctx, field)
 			case "numCredit":
 				return ec.fieldContext_Syllabus_numCredit(ctx, field)
-			case "courceFormat":
-				return ec.fieldContext_Syllabus_courceFormat(ctx, field)
+			case "courseFormat":
+				return ec.fieldContext_Syllabus_courseFormat(ctx, field)
 			case "assignedGrade":
 				return ec.fieldContext_Syllabus_assignedGrade(ctx, field)
 			case "targetedAudience":
 				return ec.fieldContext_Syllabus_targetedAudience(ctx, field)
-			case "courceDayPeriod":
-				return ec.fieldContext_Syllabus_courceDayPeriod(ctx, field)
+			case "courseDayPeriod":
+				return ec.fieldContext_Syllabus_courseDayPeriod(ctx, field)
 			case "outline":
 				return ec.fieldContext_Syllabus_outline(ctx, field)
 			case "objective":
@@ -3027,8 +3033,8 @@ func (ec *executionContext) fieldContext_Subject_syllabus(ctx context.Context, f
 				return ec.fieldContext_Syllabus_lessonPlan(ctx, field)
 			case "gradingMethod":
 				return ec.fieldContext_Syllabus_gradingMethod(ctx, field)
-			case "courceRequirement":
-				return ec.fieldContext_Syllabus_courceRequirement(ctx, field)
+			case "courseRequirement":
+				return ec.fieldContext_Syllabus_courseRequirement(ctx, field)
 			case "outClassLearning":
 				return ec.fieldContext_Syllabus_outClassLearning(ctx, field)
 			case "reference":
@@ -3454,7 +3460,7 @@ func (ec *executionContext) _Syllabus_academicYear(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AcademicYear, nil
+		return ec.resolvers.Syllabus().AcademicYear(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3475,8 +3481,8 @@ func (ec *executionContext) fieldContext_Syllabus_academicYear(ctx context.Conte
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -3542,7 +3548,7 @@ func (ec *executionContext) _Syllabus_numCredit(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.NumCredit, nil
+		return ec.resolvers.Syllabus().NumCredit(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3563,8 +3569,8 @@ func (ec *executionContext) fieldContext_Syllabus_numCredit(ctx context.Context,
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -3572,8 +3578,8 @@ func (ec *executionContext) fieldContext_Syllabus_numCredit(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Syllabus_courceFormat(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Syllabus_courceFormat(ctx, field)
+func (ec *executionContext) _Syllabus_courseFormat(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Syllabus_courseFormat(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3586,7 +3592,7 @@ func (ec *executionContext) _Syllabus_courceFormat(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CourceFormat, nil
+		return obj.CourseFormat, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3603,7 +3609,7 @@ func (ec *executionContext) _Syllabus_courceFormat(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Syllabus_courceFormat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Syllabus_courseFormat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
@@ -3704,8 +3710,8 @@ func (ec *executionContext) fieldContext_Syllabus_targetedAudience(ctx context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _Syllabus_courceDayPeriod(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Syllabus_courceDayPeriod(ctx, field)
+func (ec *executionContext) _Syllabus_courseDayPeriod(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Syllabus_courseDayPeriod(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3718,7 +3724,7 @@ func (ec *executionContext) _Syllabus_courceDayPeriod(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CourceDayPeriod, nil
+		return obj.CourseDayPeriod, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3735,7 +3741,7 @@ func (ec *executionContext) _Syllabus_courceDayPeriod(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Syllabus_courceDayPeriod(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Syllabus_courseDayPeriod(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
@@ -3924,8 +3930,8 @@ func (ec *executionContext) fieldContext_Syllabus_gradingMethod(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Syllabus_courceRequirement(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Syllabus_courceRequirement(ctx, field)
+func (ec *executionContext) _Syllabus_courseRequirement(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Syllabus_courseRequirement(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3938,7 +3944,7 @@ func (ec *executionContext) _Syllabus_courceRequirement(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CourceRequirement, nil
+		return obj.CourseRequirement, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3955,7 +3961,7 @@ func (ec *executionContext) _Syllabus_courceRequirement(ctx context.Context, fie
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Syllabus_courceRequirement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Syllabus_courseRequirement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
@@ -6956,140 +6962,166 @@ func (ec *executionContext) _Syllabus(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Syllabus_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "faculty":
 
 			out.Values[i] = ec._Syllabus_faculty(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "language":
 
 			out.Values[i] = ec._Syllabus_language(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "subjectNumbering":
 
 			out.Values[i] = ec._Syllabus_subjectNumbering(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "academicYear":
+			field := field
 
-			out.Values[i] = ec._Syllabus_academicYear(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Syllabus_academicYear(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "semester":
 
 			out.Values[i] = ec._Syllabus_semester(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "numCredit":
+			field := field
 
-			out.Values[i] = ec._Syllabus_numCredit(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Syllabus_numCredit(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
-		case "courceFormat":
 
-			out.Values[i] = ec._Syllabus_courceFormat(ctx, field, obj)
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "courseFormat":
+
+			out.Values[i] = ec._Syllabus_courseFormat(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "assignedGrade":
 
 			out.Values[i] = ec._Syllabus_assignedGrade(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "targetedAudience":
 
 			out.Values[i] = ec._Syllabus_targetedAudience(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "courceDayPeriod":
+		case "courseDayPeriod":
 
-			out.Values[i] = ec._Syllabus_courceDayPeriod(ctx, field, obj)
+			out.Values[i] = ec._Syllabus_courseDayPeriod(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "outline":
 
 			out.Values[i] = ec._Syllabus_outline(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "objective":
 
 			out.Values[i] = ec._Syllabus_objective(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "lessonPlan":
 
 			out.Values[i] = ec._Syllabus_lessonPlan(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "gradingMethod":
 
 			out.Values[i] = ec._Syllabus_gradingMethod(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "courceRequirement":
+		case "courseRequirement":
 
-			out.Values[i] = ec._Syllabus_courceRequirement(ctx, field, obj)
+			out.Values[i] = ec._Syllabus_courseRequirement(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "outClassLearning":
 
 			out.Values[i] = ec._Syllabus_outClassLearning(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "reference":
 
 			out.Values[i] = ec._Syllabus_reference(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "remark":
 
 			out.Values[i] = ec._Syllabus_remark(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "subpages":
 
 			out.Values[i] = ec._Syllabus_subpages(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

@@ -76,7 +76,6 @@ func (r *subjectResolver) RelatedSubjects(ctx context.Context, obj *model.Subjec
 
 // Syllabus is the resolver for the syllabus field.
 func (r *subjectResolver) Syllabus(ctx context.Context, obj *model.Subject) (*model.Syllabus, error) {
-
 	syllabusDTO, err := r.slU.GetById(obj.SyllabusId)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of SyllabusUsecase: %w", err)
