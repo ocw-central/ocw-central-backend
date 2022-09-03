@@ -15,7 +15,7 @@ func GetQuestionMarkStrs(num int) string {
 }
 
 type SubjectSearchParameter struct {
-	Title string
-	Faculty string
+	Title         string
+	Faculty       string
 	AcademicField string
 }

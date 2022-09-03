@@ -289,5 +289,3 @@ func (sR SubjectRepositoryImpl) convertSubjectDTOToSubject(subjectDTO dto.Subjec
 
 	return subject, nil
 }
-
-
