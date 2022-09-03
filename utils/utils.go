@@ -13,3 +13,9 @@ func ConvertNilToZeroValue[T any](value *T) T {
 func GetQuestionMarkStrs(num int) string {
 	return strings.Join(strings.Split(strings.Repeat("?", num), ""), ",")
 }
+
+type SubjectSearchParameter struct {
+	Title string
+	Faculty string
+	AcademicField string
+}

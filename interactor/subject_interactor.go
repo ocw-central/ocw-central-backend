@@ -6,6 +6,7 @@ import (
 	"github.com/kafugen/ocwcentral/domain/repository"
 	"github.com/kafugen/ocwcentral/domain/usecase/dto"
 	"github.com/kafugen/ocwcentral/model"
+	"github.com/kafugen/ocwcentral/utils"
 )
 
 type SubjectInteractor struct {
@@ -43,6 +44,20 @@ func (sI SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
 	subjects, err := sI.sR.GetByIds(subjectIds)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` of SubjectRepository: %w", err)
+	}
+
+	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
+	for i, subject := range subjects {
+		subjectDTOs[i] = convertModelToDTO(subject)
+	}
+	return subjectDTOs, nil
+}
+
+func (sI SubjectInteractor) GetBySearchParameter(searchParameter utils.SubjectSearchParameter) ([]*dto.SubjectDTO, error) {
+
+	subjects, err := sI.sR.GetBySearchParameter(searchParameter)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` of SubjectRepository: %w", err)
 	}
 
 	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
