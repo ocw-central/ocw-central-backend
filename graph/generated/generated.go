@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/kafugen/ocwcentral/graph/model"
+	graph "github.com/kafugen/ocwcentral/graph/scalar"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -39,7 +40,6 @@ type Config struct {
 type ResolverRoot interface {
 	Query() QueryResolver
 	Subject() SubjectResolver
-	Syllabus() SyllabusResolver
 }
 
 type DirectiveRoot struct {
@@ -156,11 +156,6 @@ type SubjectResolver interface {
 	RelatedSubjects(ctx context.Context, obj *model.Subject) ([]*model.RelatedSubject, error)
 
 	Syllabus(ctx context.Context, obj *model.Subject) (*model.Syllabus, error)
-}
-type SyllabusResolver interface {
-	AcademicYear(ctx context.Context, obj *model.Syllabus) (int, error)
-
-	NumCredit(ctx context.Context, obj *model.Syllabus) (int, error)
 }
 
 type executableSchema struct {
@@ -3460,7 +3455,7 @@ func (ec *executionContext) _Syllabus_academicYear(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Syllabus().AcademicYear(rctx, obj)
+		return obj.AcademicYear, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3472,17 +3467,17 @@ func (ec *executionContext) _Syllabus_academicYear(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(int16)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNInt2int16(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Syllabus_academicYear(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -3548,7 +3543,7 @@ func (ec *executionContext) _Syllabus_numCredit(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Syllabus().NumCredit(rctx, obj)
+		return obj.NumCredit, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3560,17 +3555,17 @@ func (ec *executionContext) _Syllabus_numCredit(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(int8)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNInt2int8(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Syllabus_numCredit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -6962,166 +6957,140 @@ func (ec *executionContext) _Syllabus(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Syllabus_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "faculty":
 
 			out.Values[i] = ec._Syllabus_faculty(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "language":
 
 			out.Values[i] = ec._Syllabus_language(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "subjectNumbering":
 
 			out.Values[i] = ec._Syllabus_subjectNumbering(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "academicYear":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Syllabus_academicYear(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Syllabus_academicYear(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
 			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "semester":
 
 			out.Values[i] = ec._Syllabus_semester(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "numCredit":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Syllabus_numCredit(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Syllabus_numCredit(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
 			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "courseFormat":
 
 			out.Values[i] = ec._Syllabus_courseFormat(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "assignedGrade":
 
 			out.Values[i] = ec._Syllabus_assignedGrade(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "targetedAudience":
 
 			out.Values[i] = ec._Syllabus_targetedAudience(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "courseDayPeriod":
 
 			out.Values[i] = ec._Syllabus_courseDayPeriod(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "outline":
 
 			out.Values[i] = ec._Syllabus_outline(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "objective":
 
 			out.Values[i] = ec._Syllabus_objective(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "lessonPlan":
 
 			out.Values[i] = ec._Syllabus_lessonPlan(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "gradingMethod":
 
 			out.Values[i] = ec._Syllabus_gradingMethod(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "courseRequirement":
 
 			out.Values[i] = ec._Syllabus_courseRequirement(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "outClassLearning":
 
 			out.Values[i] = ec._Syllabus_outClassLearning(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "reference":
 
 			out.Values[i] = ec._Syllabus_reference(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "remark":
 
 			out.Values[i] = ec._Syllabus_remark(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "subpages":
 
 			out.Values[i] = ec._Syllabus_subpages(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -7653,6 +7622,36 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
 	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int16(ctx context.Context, v interface{}) (int16, error) {
+	res, err := graph.UnmarshalInt16(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int16(ctx context.Context, sel ast.SelectionSet, v int16) graphql.Marshaler {
+	res := graph.MarshalInt16(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int8(ctx context.Context, v interface{}) (int8, error) {
+	res, err := graph.UnmarshalInt8(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int8(ctx context.Context, sel ast.SelectionSet, v int8) graphql.Marshaler {
+	res := graph.MarshalInt8(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
