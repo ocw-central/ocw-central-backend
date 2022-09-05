@@ -131,7 +131,6 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 		))
 		rowIndex++
 	}
-	fmt.Print("subpage", subpages)
 	return subpages, nil
 
 }
