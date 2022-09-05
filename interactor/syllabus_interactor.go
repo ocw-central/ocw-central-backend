@@ -17,10 +17,9 @@ func NewSyllabusInteractor(sR repository.SyllabusRepository) SyllabusInteractor 
 }
 
 func (sI SyllabusInteractor) GetById(id string) (*dto.SyllabusDTO, error) {
-
 	syllabusId, err := model.NewSyllabusId(id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create `SubjectId` struct: %w", err)
+		return nil, fmt.Errorf("failed to create `SyllabusId` struct: %w", err)
 	}
 
 	syllabus, err := sI.sR.GetById(*syllabusId)
