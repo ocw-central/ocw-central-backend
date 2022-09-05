@@ -55,7 +55,7 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 			content
 		FROM syllabuses
 		LEFT JOIN subpages 
-		ON syllabuses.subjevt_id = subpages.subject_id
+		ON syllabuses.subject_id = subpages.subject_id
 		WHERE syllabuses.id = (` + utils.GetQuestionMarkStrs(len(ids)) + `)
 	`
 
@@ -108,7 +108,6 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 
 // returns a list of subpages with the same syllabusId
 func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage, error) {
-
 	if syllabusSubpageDTOs[0].SubpageId == nil {
 		return nil, nil
 	}
@@ -137,5 +136,10 @@ func (sR SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get syllabus (id: %v): %w", id, err)
 	}
-	return syllabuses[0], nil
+
+	if len(syllabuses) == 0 {
+		return nil, nil
+	} else {
+		return syllabuses[0], nil
+	}
 }
