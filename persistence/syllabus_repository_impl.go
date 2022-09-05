@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -64,6 +65,7 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 	}
 
 	rowIndex := 0
+
 	syllabuses := make([]*model.Syllabus, len(ids))
 	for syllabusIndex := 0; syllabusIndex < len(syllabuses); syllabusIndex++ {
 		syllabusSubpageDTO := syllabusSubpageDTOs[rowIndex]
@@ -116,7 +118,8 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 
 	// number of subpages is expected to be less than 20
 	subpages := make([]model.Subpage, 0, 20)
-	for syllabusSubpageDTOs[0].Id == syllabusSubpageDTOs[rowIndex].Id {
+
+	for rowIndex < len(syllabusSubpageDTOs) && bytes.Equal(*syllabusSubpageDTOs[0].Id, *syllabusSubpageDTOs[rowIndex].Id) {
 		subpageId, err := model.NewSubpageId(*syllabusSubpageDTOs[rowIndex].SubpageId)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create `subpageId`: %w", err)
@@ -128,7 +131,9 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 		))
 		rowIndex++
 	}
+	fmt.Print("subpage", subpages)
 	return subpages, nil
+
 }
 
 func (sR SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, error) {
