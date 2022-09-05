@@ -54,7 +54,7 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 		FROM syllabuses
 		LEFT JOIN subpages 
 		ON syllabuses.subject_id = subpages.subject_id
-		WHERE syllabuses.id = (` + utils.GetQuestionMarkStrs(len(ids)) + `)
+		WHERE syllabuses.id in (` + utils.GetQuestionMarkStrs(len(ids)) + `)
 		ORDER BY syllabuses.id, subpages.id
 	`
 
@@ -65,43 +65,42 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 
 	rowIndex := 0
 	syllabuses := make([]*model.Syllabus, len(ids))
-	for syllabusIndex := 0; syllabusIndex < len(ids); syllabusIndex++ {
-		for _, syllabusSubpageDTO := range syllabusSubpageDTOs {
-			subpages, err := getSubpages(syllabusSubpageDTOs[rowIndex:])
-			if err != nil {
-				return nil, fmt.Errorf("failed to get subpages (rowIndex: %v): %w", rowIndex, err)
-			}
+	for syllabusIndex := 0; syllabusIndex < len(syllabuses); syllabusIndex++ {
+		syllabusSubpageDTO := syllabusSubpageDTOs[rowIndex]
 
-			syllabusId, err := model.NewSyllabusId(*syllabusSubpageDTO.Id)
-			if err != nil {
-				return nil, fmt.Errorf("failed to create `syllabusId`: %w", err)
-			}
-
-			syllabuses[syllabusIndex] = model.NewSyllabusFromRepository(
-				*syllabusId,
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Faculty),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Language),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.SubjectNumbering),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.AcademicYear),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Semester),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.NumCredit),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseFormat),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.AssignedGrade),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.TargetedAudience),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseDayPeriod),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Outline),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Objective),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.LessonPlan),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.GradingMethod),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseRequirement),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.OutclassLearning),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Reference),
-				utils.ConvertNilToZeroValue(syllabusSubpageDTO.Remark),
-				subpages,
-			)
-
-			rowIndex += len(subpages)
+		syllabusId, err := model.NewSyllabusId(*syllabusSubpageDTO.Id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create `syllabusId`: %w", err)
 		}
+
+		subpages, err := getSubpages(syllabusSubpageDTOs[rowIndex:])
+		if err != nil {
+			return nil, fmt.Errorf("failed to get subpages (rowIndex: %v): %w", rowIndex, err)
+		}
+
+		syllabuses[syllabusIndex] = model.NewSyllabusFromRepository(
+			*syllabusId,
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Faculty),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Language),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.SubjectNumbering),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.AcademicYear),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Semester),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.NumCredit),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseFormat),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.AssignedGrade),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.TargetedAudience),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseDayPeriod),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Outline),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Objective),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.LessonPlan),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.GradingMethod),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.CourseRequirement),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.OutclassLearning),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Reference),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Remark),
+			subpages,
+		)
+		rowIndex += len(subpages)
 		syllabusIndex++
 	}
 	return syllabuses, nil
@@ -115,9 +114,9 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 
 	rowIndex := 0
 
-	// number of subpages is expected to be less than 15
-	subpages := make([]model.Subpage, 0, 15)
-	for rowIndex < len(syllabusSubpageDTOs) && syllabusSubpageDTOs[0].Id == syllabusSubpageDTOs[rowIndex].Id {
+	// number of subpages is expected to be less than 20
+	subpages := make([]model.Subpage, 0, 20)
+	for syllabusSubpageDTOs[0].Id == syllabusSubpageDTOs[rowIndex].Id {
 		subpageId, err := model.NewSubpageId(*syllabusSubpageDTOs[rowIndex].SubpageId)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create `subpageId`: %w", err)
