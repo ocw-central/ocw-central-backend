@@ -67,7 +67,7 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 	rowIndex := 0
 
 	syllabuses := make([]*model.Syllabus, len(ids))
-	for syllabusIndex := 0; syllabusIndex < len(syllabuses); syllabusIndex++ {
+	for syllabusIndex := 0; syllabusIndex < len(syllabuses); {
 		syllabusSubpageDTO := syllabusSubpageDTOs[rowIndex]
 
 		syllabusId, err := model.NewSyllabusId(*syllabusSubpageDTO.Id)
