@@ -70,7 +70,7 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 
 		subpages, err := getSubpages(syllabusSubpageDTOs[rowIndex:])
 		if err != nil {
-			return nil, fmt.Errorf("failed to get subpages (rowIndex: %v, ordering: %v): %w", rowIndex, err)
+			return nil, fmt.Errorf("failed to get subpages (rowIndex: %v): %w", rowIndex, err)
 		}
 
 		syllabusId, err := model.NewSyllabusId(*syllabusSubpageDTO.Id)
