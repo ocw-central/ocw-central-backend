@@ -10,7 +10,7 @@ type SyllabusSubpageDTO struct {
 	NumCredit         *int8   `db:"num_credit"`
 	CourseFormat      *string `db:"course_format"`
 	AssignedGrade     *string `db:"assigned_grade"`
-	TargettedAudience *string `db:"targetted_audience"`
+	TargetedAudience  *string `db:"targeted_audience"`
 	CourseDayPeriod   *string `db:"course_day_period"`
 	Outline           *string `db:"outline"`
 	Objective         *string `db:"objective"`
