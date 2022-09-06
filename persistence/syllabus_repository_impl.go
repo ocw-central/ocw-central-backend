@@ -67,7 +67,7 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 	rowIndex := 0
 
 	syllabuses := make([]*model.Syllabus, len(ids))
-	for syllabusIndex := 0; syllabusIndex < len(syllabuses); {
+	for syllabusIndex := 0; syllabusIndex < len(syllabuses); syllabusIndex++ {
 		syllabusSubpageDTO := syllabusSubpageDTOs[rowIndex]
 
 		syllabusId, err := model.NewSyllabusId(*syllabusSubpageDTO.Id)
@@ -103,12 +103,11 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 			subpages,
 		)
 		rowIndex += len(subpages)
-		syllabusIndex++
 	}
 	return syllabuses, nil
 }
 
-// returns a list of subpages with the same syllabusId
+// GetSubpages returns a list of subpages with the same syllabusId
 func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage, error) {
 	if syllabusSubpageDTOs[0].SubpageId == nil {
 		return nil, nil
@@ -138,7 +137,7 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 func (sR SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, error) {
 	syllabuses, err := sR.GetByIds([]model.SyllabusId{id})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get syllabus (id: %v): %w", id, err)
+		return nil, fmt.Errorf("failed to get syllabus : %w", err)
 	}
 
 	if len(syllabuses) == 0 {
