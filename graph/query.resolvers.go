@@ -24,6 +24,9 @@ func (r *queryResolver) Subject(ctx context.Context, id string) (*model.Subject,
 
 // Subjects is the resolver for the subjects field.
 func (r *queryResolver) Subjects(ctx context.Context, title *string, faculty *string, academicField *string) ([]*model.Subject, error) {
+	if title == nil && faculty == nil && academicField == nil {
+		return nil, fmt.Errorf("at least one of the parameters must be specified")
+	}
 	subjectSearchParameter := utils.SubjectSearchParameter{
 		Title:         utils.ConvertNilToZeroValue(title),
 		Faculty:       utils.ConvertNilToZeroValue(faculty),
@@ -31,7 +34,7 @@ func (r *queryResolver) Subjects(ctx context.Context, title *string, faculty *st
 	}
 	subjects, err := r.sbU.GetBySearchParameter(subjectSearchParameter)
 	if err != nil {
-		return nil, fmt.Errorf("failed on executing `GetByTitleAndDepartment` func of SubjectUsecase: %w", err)
+		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` func of SubjectUsecase: %w", err)
 	}
 	ss := make([]*model.Subject, len(subjects))
 	for i, subject := range subjects {

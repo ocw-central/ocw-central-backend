@@ -161,37 +161,62 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(searchParameter utils.Subje
 		LEFT JOIN syllabuses
 		ON subjects.id = syllabuses.subject_id
 		`
-	// %% is wildcard for LIKE but null value record is excluded, so we don't use it.
+	// Assemble named prepared statement(subjectSQL) and parameters
 	searchQuery := ""
+	parameters := map[string]interface{}{}
+	// for positional arg index
 	// for Title
 	if searchParameter.Title != "" {
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "title LIKE \"%" + searchParameter.Title + "%\""
+		searchQuery += "title LIKE " + ":title"
+		parameters["title"] = "%" + searchParameter.Title + "%"
+
 	}
 	// for Faculty
 	if searchParameter.Faculty != "" {
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "subjects.faculty LIKE \"%" + searchParameter.Faculty + "%\""
+		searchQuery += "subjects.faculty LIKE " + ":faculty"
+		parameters["faculty"] = "%" + searchParameter.Faculty + "%"
+
 	}
 	// for AcademicField
 	if searchParameter.AcademicField != "" {
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "academic_field LIKE \"%" + searchParameter.AcademicField + "%\""
+		searchQuery += "academic_field LIKE " + ":academic_field"
+		parameters["academic_field"] = "%" + searchParameter.AcademicField + "%"
+
 	}
 	// add WHERE prefix to searchQuery
 	if searchQuery != "" {
 		searchQuery = "WHERE " + searchQuery
 	}
 	subjectSQL += searchQuery
-	if err := sR.db.Select(&subjectDTOs, subjectSQL); err != nil {
-		return nil, fmt.Errorf("failed on select to `subjects` table: %w", err)
+	// prepare statement
+	stmt, err := sR.db.PrepareNamed(subjectSQL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare statement: %w", err)
 	}
+	// execute statement
+	rows, err := stmt.Queryx(parameters)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute statement: %w", err)
+	}
+	// scan rows
+	for rows.Next() {
+		subjectDTO := dto.SubjectDTO{}
+		err := rows.StructScan(&subjectDTO)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		subjectDTOs = append(subjectDTOs, subjectDTO)
+	}
+
 	subjects := make([]*model.Subject, 0)
 	for _, subjectDTO := range subjectDTOs {
 		subject, err := sR.convertSubjectDTOToSubject(subjectDTO)
@@ -259,8 +284,6 @@ func (sR SubjectRepositoryImpl) convertSubjectDTOToSubject(subjectDTO dto.Subjec
 		if err != nil {
 			return nil, fmt.Errorf("failed to create `syllabusId`: %w", err)
 		}
-	} else {
-		syllabusId = nil
 	}
 
 	id, err := model.NewSubjectId(*subjectDTO.Id)
