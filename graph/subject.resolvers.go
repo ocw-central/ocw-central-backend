@@ -81,13 +81,11 @@ func (r *subjectResolver) Syllabus(ctx context.Context, obj *model.Subject) (*mo
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of SyllabusUsecase: %w", err)
 	}
 
-	var syllabus *model.Syllabus
-
 	subpages := make([]model.Subpage, len(syllabusDTO.Subpages))
 	for i, subpage := range syllabusDTO.Subpages {
 		subpages[i] = model.Subpage(subpage)
 	}
-	syllabus = &model.Syllabus{
+	syllabus := &model.Syllabus{
 		ID:                syllabusDTO.ID,
 		Faculty:           syllabusDTO.Faculty,
 		Language:          syllabusDTO.Language,
