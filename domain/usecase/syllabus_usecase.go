@@ -5,5 +5,5 @@ import (
 )
 
 type SyllabusUsecase interface {
-	GetById(id []string) (*dto.SyllabusDTO, error)
+	GetById(id string) (*dto.SyllabusDTO, error)
 }
