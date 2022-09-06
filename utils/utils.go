@@ -14,6 +14,8 @@ func GetQuestionMarkStrs(num int) string {
 	return strings.Join(strings.Split(strings.Repeat("?", num), ""), ",")
 }
 
+func IgnoreErr(err error) {}
+
 type SubjectSearchParameter struct {
 	Title         string
 	Faculty       string
