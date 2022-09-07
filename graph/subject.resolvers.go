@@ -16,6 +16,7 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 	if len(obj.VideoIds) == 0 {
 		return nil, nil
 	}
+
 	videoDTOs, err := r.vU.GetByIds(obj.VideoIds)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of VideoUsecase: %w", err)
@@ -47,6 +48,7 @@ func (r *subjectResolver) Resources(ctx context.Context, obj *model.Subject) ([]
 	if len(obj.ResourceIds) == 0 {
 		return nil, nil
 	}
+
 	resouceDTOs, err := r.rU.GetByIds(obj.ResourceIds)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of ResourceUsecase: %w", err)
@@ -70,6 +72,7 @@ func (r *subjectResolver) RelatedSubjects(ctx context.Context, obj *model.Subjec
 	if len(obj.RelatedSubjectIds) == 0 {
 		return nil, nil
 	}
+
 	subjects, err := r.sbU.GetByIds(obj.RelatedSubjectIds)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetById` func of SubjectUsecase: %w", err)
@@ -88,6 +91,7 @@ func (r *subjectResolver) Syllabus(ctx context.Context, obj *model.Subject) (*mo
 	if len(obj.SyllabusId) == 0 {
 		return nil, nil
 	}
+
 	syllabusDTO, err := r.slU.GetById(obj.SyllabusId)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of SyllabusUsecase: %w", err)
