@@ -127,8 +127,8 @@ func (sR *SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, er
 	return subject, nil
 }
 
+// FIXME: this causes N+1 query problem
 func (sR *SubjectRepositoryImpl) GetByIds(ids []model.SubjectId) ([]*model.Subject, error) {
-	// FIXME: this causes N+1 query problem
 	subjects := make([]*model.Subject, len(ids))
 	for i, id := range ids {
 		subject, err := sR.GetById(id)
