@@ -12,13 +12,27 @@ import (
 
 func main() {
 	env := env.NewEnvConfig()
+
+	var frontendOrigin string
+	if env.AppEnv == "DEV" {
+		frontendOrigin = "http://127.0.0.1:5173"
+	} else if env.AppEnv == "PROD" {
+		frontendOrigin = "https://ocwcentral.com"
+	} else {
+		panic("invalid APP_ENV")
+	}
+
 	resolver := InitializeResolver()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
-
+	http.HandleFunc("/query", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Origin", frontendOrigin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		srv.ServeHTTP(w, r)
+	})
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", env.Port)
 	log.Fatal(http.ListenAndServe(":"+env.Port, nil))
 }
