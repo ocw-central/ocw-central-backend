@@ -813,7 +813,7 @@ scalar Time
   faculty: String!
   language: String!
   freeDescription: String!
-  syllabus: Syllabus!
+  syllabus: Syllabus
   series: String!
   academicField: String!
   thumbnailLink: String!
@@ -2980,14 +2980,11 @@ func (ec *executionContext) _Subject_syllabus(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Syllabus)
 	fc.Result = res
-	return ec.marshalNSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx, field.Selections, res)
+	return ec.marshalOSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Subject_syllabus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6865,9 +6862,6 @@ func (ec *executionContext) _Subject(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Subject_syllabus(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -7889,20 +7883,6 @@ func (ec *executionContext) marshalNSubpage2ᚕgithubᚗcomᚋkafugenᚋocwcentr
 	return ret
 }
 
-func (ec *executionContext) marshalNSyllabus2githubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx context.Context, sel ast.SelectionSet, v model.Syllabus) graphql.Marshaler {
-	return ec._Syllabus(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx context.Context, sel ast.SelectionSet, v *model.Syllabus) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Syllabus(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -8265,6 +8245,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx context.Context, sel ast.SelectionSet, v *model.Syllabus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Syllabus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
