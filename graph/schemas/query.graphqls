@@ -1,4 +1,5 @@
 type Query {
   subject(id: ID!): Subject!
   subjects(title: String, department: String, ): [Subject!]!
+  academicFields: [AcademicField!]!
 }

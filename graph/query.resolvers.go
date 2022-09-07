@@ -26,6 +26,21 @@ func (r *queryResolver) Subjects(ctx context.Context, title *string, department 
 	panic(fmt.Errorf("not implemented: Subjects - subjects"))
 }
 
+// AcademicFields is the resolver for the academicFields field.
+func (r *queryResolver) AcademicFields(ctx context.Context) ([]*model.AcademicField, error) {
+	academicFieldNames, err := r.afU.Get()
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `Get` func of AcademicFieldUsecase: %w", err)
+	}
+	academicFields := make([]*model.AcademicField, len(academicFieldNames))
+	for i, name := range academicFieldNames {
+		academicFields[i] = &model.AcademicField{
+			Name: name,
+		}
+	}
+	return academicFields, nil
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
