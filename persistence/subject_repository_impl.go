@@ -15,11 +15,11 @@ type SubjectRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func NewSubjectRepositoryImpl(db *sqlx.DB) SubjectRepositoryImpl {
-	return SubjectRepositoryImpl{db}
+func NewSubjectRepositoryImpl(db *sqlx.DB) *SubjectRepositoryImpl {
+	return &SubjectRepositoryImpl{db}
 }
 
-func (sR SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, error) {
+func (sR *SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, error) {
 	subjectIdBytes := id.ByteSlice()
 
 	subjectDTO := dto.SubjectDTO{}
@@ -127,7 +127,7 @@ func (sR SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, err
 	return subject, nil
 }
 
-func (sR SubjectRepositoryImpl) GetByIds(ids []model.SubjectId) ([]*model.Subject, error) {
+func (sR *SubjectRepositoryImpl) GetByIds(ids []model.SubjectId) ([]*model.Subject, error) {
 	// FIXME: this causes N+1 query problem
 	subjects := make([]*model.Subject, len(ids))
 	for i, id := range ids {

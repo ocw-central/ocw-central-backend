@@ -15,11 +15,11 @@ type VideoRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func NewVideoRepositoryImpl(db *sqlx.DB) VideoRepositoryImpl {
-	return VideoRepositoryImpl{db}
+func NewVideoRepositoryImpl(db *sqlx.DB) *VideoRepositoryImpl {
+	return &VideoRepositoryImpl{db}
 }
 
-func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, error) {
+func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
