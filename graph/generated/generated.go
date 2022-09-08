@@ -46,6 +46,10 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AcademicField struct {
+		Name func(childComplexity int) int
+	}
+
 	Chapter struct {
 		ID            func(childComplexity int) int
 		StartAt       func(childComplexity int) int
@@ -54,8 +58,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Subject  func(childComplexity int, id string) int
-		Subjects func(childComplexity int, title *string, department *string) int
+		AcademicFields func(childComplexity int) int
+		Subject        func(childComplexity int, id string) int
+		Subjects       func(childComplexity int, title *string, department *string) int
 	}
 
 	RelatedSubject struct {
@@ -148,6 +153,7 @@ type ComplexityRoot struct {
 type QueryResolver interface {
 	Subject(ctx context.Context, id string) (*model.Subject, error)
 	Subjects(ctx context.Context, title *string, department *string) ([]*model.Subject, error)
+	AcademicFields(ctx context.Context) ([]*model.AcademicField, error)
 }
 type SubjectResolver interface {
 	Videos(ctx context.Context, obj *model.Subject) ([]*model.Video, error)
@@ -172,6 +178,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AcademicField.name":
+		if e.complexity.AcademicField.Name == nil {
+			break
+		}
+
+		return e.complexity.AcademicField.Name(childComplexity), true
 
 	case "Chapter.id":
 		if e.complexity.Chapter.ID == nil {
@@ -200,6 +213,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Chapter.Topic(childComplexity), true
+
+	case "Query.academicFields":
+		if e.complexity.Query.AcademicFields == nil {
+			break
+		}
+
+		return e.complexity.Query.AcademicFields(childComplexity), true
 
 	case "Query.subject":
 		if e.complexity.Query.Subject == nil {
@@ -753,6 +773,10 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
+	{Name: "../schemas/academic_field.graphqls", Input: `type AcademicField {
+  name: String!
+}
+`, BuiltIn: false},
 	{Name: "../schemas/chapter.graphqls", Input: `type Chapter implements Node {
   id: ID!
   startAt: Int!
@@ -768,6 +792,7 @@ var sources = []*ast.Source{
 	{Name: "../schemas/query.graphqls", Input: `type Query {
   subject(id: ID!): Subject!
   subjects(title: String, department: String, ): [Subject!]!
+  academicFields: [AcademicField!]!
 }
 `, BuiltIn: false},
 	{Name: "../schemas/related_subject.graphqls", Input: `type RelatedSubject implements Node {
@@ -957,6 +982,50 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AcademicField_name(ctx context.Context, field graphql.CollectedField, obj *model.AcademicField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AcademicField_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AcademicField_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AcademicField",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Chapter_id(ctx context.Context, field graphql.CollectedField, obj *model.Chapter) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Chapter_id(ctx, field)
@@ -1308,6 +1377,54 @@ func (ec *executionContext) fieldContext_Query_subjects(ctx context.Context, fie
 	if fc.Args, err = ec.field_Query_subjects_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_academicFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_academicFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AcademicFields(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AcademicField)
+	fc.Result = res
+	return ec.marshalNAcademicField2ᚕᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicFieldᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_academicFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_AcademicField_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AcademicField", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -6393,6 +6510,34 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 // region    **************************** object.gotpl ****************************
 
+var academicFieldImplementors = []string{"AcademicField"}
+
+func (ec *executionContext) _AcademicField(ctx context.Context, sel ast.SelectionSet, obj *model.AcademicField) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, academicFieldImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AcademicField")
+		case "name":
+
+			out.Values[i] = ec._AcademicField_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var chapterImplementors = []string{"Chapter", "Node"}
 
 func (ec *executionContext) _Chapter(ctx context.Context, sel ast.SelectionSet, obj *model.Chapter) graphql.Marshaler {
@@ -6494,6 +6639,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_subjects(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "academicFields":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_academicFields(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -7498,6 +7666,60 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) marshalNAcademicField2ᚕᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicFieldᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AcademicField) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAcademicField2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicField(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAcademicField2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicField(ctx context.Context, sel ast.SelectionSet, v *model.AcademicField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AcademicField(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)

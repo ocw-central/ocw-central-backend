@@ -14,11 +14,11 @@ type ResourceRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func NewResourceRepositoryImpl(db *sqlx.DB) ResourceRepositoryImpl {
-	return ResourceRepositoryImpl{db}
+func NewResourceRepositoryImpl(db *sqlx.DB) *ResourceRepositoryImpl {
+	return &ResourceRepositoryImpl{db}
 }
 
-func (vR ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Resource, error) {
+func (vR *ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Resource, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}

@@ -15,11 +15,11 @@ type SyllabusRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func NewSyllabusRepositoryImpl(db *sqlx.DB) SyllabusRepositoryImpl {
-	return SyllabusRepositoryImpl{db}
+func NewSyllabusRepositoryImpl(db *sqlx.DB) *SyllabusRepositoryImpl {
+	return &SyllabusRepositoryImpl{db}
 }
 
-func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syllabus, error) {
+func (sR *SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syllabus, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
@@ -53,7 +53,7 @@ func (sR SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syll
 			subpages.id AS subpage_id,
 			content
 		FROM syllabuses
-		LEFT JOIN subpages 
+		LEFT JOIN subpages
 		ON syllabuses.subject_id = subpages.subject_id
 		WHERE syllabuses.id in (` + utils.GetQuestionMarkStrs(len(ids)) + `)
 		ORDER BY syllabuses.id, subpages.id
@@ -134,7 +134,7 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 
 }
 
-func (sR SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, error) {
+func (sR *SyllabusRepositoryImpl) GetById(id model.SyllabusId) (*model.Syllabus, error) {
 	syllabuses, err := sR.GetByIds([]model.SyllabusId{id})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get syllabus : %w", err)

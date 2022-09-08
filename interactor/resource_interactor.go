@@ -12,11 +12,11 @@ type ResourceInteractor struct {
 	sR repository.ResourceRepository
 }
 
-func NewResourceInteractor(sR repository.ResourceRepository) ResourceInteractor {
-	return ResourceInteractor{sR}
+func NewResourceInteractor(sR repository.ResourceRepository) *ResourceInteractor {
+	return &ResourceInteractor{sR}
 }
 
-func (sI ResourceInteractor) GetByIds(ids []string) ([]*dto.ResourceDTO, error) {
+func (sI *ResourceInteractor) GetByIds(ids []string) ([]*dto.ResourceDTO, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}

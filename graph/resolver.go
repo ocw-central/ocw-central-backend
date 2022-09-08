@@ -15,6 +15,7 @@ type Resolver struct {
 	vU  usecase.VideoUsecase
 	rU  usecase.ResourceUsecase
 	slU usecase.SyllabusUsecase
+	afU usecase.AcademicFieldUsecase
 }
 
 func NewResolver(
@@ -22,6 +23,13 @@ func NewResolver(
 	vU usecase.VideoUsecase,
 	rU usecase.ResourceUsecase,
 	slU usecase.SyllabusUsecase,
+	afU usecase.AcademicFieldUsecase,
 ) Resolver {
-	return Resolver{sbU, vU, rU, slU}
+	return Resolver{
+		sbU: sbU,
+		vU:  vU,
+		rU:  rU,
+		slU: slU,
+		afU: afU,
+	}
 }

@@ -26,6 +26,8 @@ func InitializeResolver() graph.Resolver {
 	resourceInteractor := interactor.NewResourceInteractor(resourceRepositoryImpl)
 	syllabusRepositoryImpl := persistence.NewSyllabusRepositoryImpl(db)
 	syllabusInteractor := interactor.NewSyllabusInteractor(syllabusRepositoryImpl)
-	resolver := graph.NewResolver(subjectInteractor, videoInteractor, resourceInteractor, syllabusInteractor)
+	academicFieldRepositoryImpl := persistence.NewAcademicFieldRepositoryImpl(db)
+	academicFieldInteractor := interactor.NewAcademicFieldInteractor(academicFieldRepositoryImpl)
+	resolver := graph.NewResolver(subjectInteractor, videoInteractor, resourceInteractor, syllabusInteractor, academicFieldInteractor)
 	return resolver
 }

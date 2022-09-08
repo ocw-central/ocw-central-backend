@@ -12,11 +12,11 @@ type SyllabusInteractor struct {
 	sR repository.SyllabusRepository
 }
 
-func NewSyllabusInteractor(sR repository.SyllabusRepository) SyllabusInteractor {
-	return SyllabusInteractor{sR}
+func NewSyllabusInteractor(sR repository.SyllabusRepository) *SyllabusInteractor {
+	return &SyllabusInteractor{sR}
 }
 
-func (sI SyllabusInteractor) GetById(id string) (*dto.SyllabusDTO, error) {
+func (sI *SyllabusInteractor) GetById(id string) (*dto.SyllabusDTO, error) {
 	syllabusId, err := model.NewSyllabusId(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create `SyllabusId` struct: %w", err)
