@@ -13,11 +13,11 @@ type SubjectInteractor struct {
 	sR repository.SubjectRepository
 }
 
-func NewSubjectInteractor(sR repository.SubjectRepository) SubjectInteractor {
-	return SubjectInteractor{sR}
+func NewSubjectInteractor(sR repository.SubjectRepository) *SubjectInteractor {
+	return &SubjectInteractor{sR}
 }
 
-func (sI SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
+func (sI *SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 	subjectId, err := model.NewSubjectId(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed on create `SubjectId` struct: %w", err)
@@ -31,7 +31,7 @@ func (sI SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 	return convertModelToDTO(subject), nil
 }
 
-func (sI SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
+func (sI *SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
 	subjectIds := make([]model.SubjectId, len(ids))
 	for i, id := range ids {
 		subjectId, err := model.NewSubjectId(id)

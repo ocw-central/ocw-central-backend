@@ -12,11 +12,11 @@ type VideoInteractor struct {
 	sR repository.VideoRepository
 }
 
-func NewVideoInteractor(sR repository.VideoRepository) VideoInteractor {
-	return VideoInteractor{sR}
+func NewVideoInteractor(sR repository.VideoRepository) *VideoInteractor {
+	return &VideoInteractor{sR}
 }
 
-func (sI VideoInteractor) GetByIds(ids []string) ([]*dto.VideoDTO, error) {
+func (sI *VideoInteractor) GetByIds(ids []string) ([]*dto.VideoDTO, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}

@@ -13,6 +13,10 @@ import (
 
 // Videos is the resolver for the videos field.
 func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*model.Video, error) {
+	if len(obj.VideoIds) == 0 {
+		return nil, nil
+	}
+
 	videoDTOs, err := r.vU.GetByIds(obj.VideoIds)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of VideoUsecase: %w", err)
@@ -41,6 +45,10 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 
 // Resources is the resolver for the resources field.
 func (r *subjectResolver) Resources(ctx context.Context, obj *model.Subject) ([]*model.Resource, error) {
+	if len(obj.ResourceIds) == 0 {
+		return nil, nil
+	}
+
 	resouceDTOs, err := r.rU.GetByIds(obj.ResourceIds)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of ResourceUsecase: %w", err)
@@ -61,6 +69,10 @@ func (r *subjectResolver) Resources(ctx context.Context, obj *model.Subject) ([]
 
 // RelatedSubjects is the resolver for the relatedSubjects field.
 func (r *subjectResolver) RelatedSubjects(ctx context.Context, obj *model.Subject) ([]*model.RelatedSubject, error) {
+	if len(obj.RelatedSubjectIds) == 0 {
+		return nil, nil
+	}
+
 	subjects, err := r.sbU.GetByIds(obj.RelatedSubjectIds)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetById` func of SubjectUsecase: %w", err)
@@ -76,6 +88,10 @@ func (r *subjectResolver) RelatedSubjects(ctx context.Context, obj *model.Subjec
 
 // Syllabus is the resolver for the syllabus field.
 func (r *subjectResolver) Syllabus(ctx context.Context, obj *model.Subject) (*model.Syllabus, error) {
+	if len(obj.SyllabusId) == 0 {
+		return nil, nil
+	}
+
 	syllabusDTO, err := r.slU.GetById(obj.SyllabusId)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByIds` func of SyllabusUsecase: %w", err)
