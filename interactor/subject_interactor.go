@@ -92,5 +92,6 @@ func convertModelToDTO(subject *model.Subject) *dto.SubjectDTO {
 		SyllabusId:        syllabusId,
 		Series:            subject.Series(),
 		AcademicField:     subject.AcademicField(),
+		ThumbnailLink:     subject.ThumbnailLink(),
 	}
 }
