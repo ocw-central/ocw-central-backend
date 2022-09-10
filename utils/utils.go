@@ -15,3 +15,9 @@ func GetQuestionMarkStrs(num int) string {
 }
 
 func IgnoreErr(err error) {}
+
+type SubjectSearchParameter struct {
+	Title         string
+	Faculty       string
+	AcademicField string
+}

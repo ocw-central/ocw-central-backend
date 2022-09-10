@@ -60,7 +60,7 @@ type ComplexityRoot struct {
 	Query struct {
 		AcademicFields func(childComplexity int) int
 		Subject        func(childComplexity int, id string) int
-		Subjects       func(childComplexity int, title *string, department *string) int
+		Subjects       func(childComplexity int, title *string, faculty *string, academicField *string) int
 	}
 
 	RelatedSubject struct {
@@ -152,7 +152,7 @@ type ComplexityRoot struct {
 
 type QueryResolver interface {
 	Subject(ctx context.Context, id string) (*model.Subject, error)
-	Subjects(ctx context.Context, title *string, department *string) ([]*model.Subject, error)
+	Subjects(ctx context.Context, title *string, faculty *string, academicField *string) ([]*model.Subject, error)
 	AcademicFields(ctx context.Context) ([]*model.AcademicField, error)
 }
 type SubjectResolver interface {
@@ -243,7 +243,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Subjects(childComplexity, args["title"].(*string), args["department"].(*string)), true
+		return e.complexity.Query.Subjects(childComplexity, args["title"].(*string), args["faculty"].(*string), args["academicField"].(*string)), true
 
 	case "RelatedSubject.academicField":
 		if e.complexity.RelatedSubject.AcademicField == nil {
@@ -791,7 +791,7 @@ var sources = []*ast.Source{
 	{Name: "../schemas/mutation.graphqls", Input: ``, BuiltIn: false},
 	{Name: "../schemas/query.graphqls", Input: `type Query {
   subject(id: ID!): Subject!
-  subjects(title: String, department: String, ): [Subject!]!
+  subjects(title: String, faculty: String, academicField: String): [Subject!]!
   academicFields: [AcademicField!]!
 }
 `, BuiltIn: false},
@@ -934,14 +934,23 @@ func (ec *executionContext) field_Query_subjects_args(ctx context.Context, rawAr
 	}
 	args["title"] = arg0
 	var arg1 *string
-	if tmp, ok := rawArgs["department"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("department"))
+	if tmp, ok := rawArgs["faculty"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("faculty"))
 		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["department"] = arg1
+	args["faculty"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["academicField"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("academicField"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["academicField"] = arg2
 	return args, nil
 }
 
@@ -1306,7 +1315,7 @@ func (ec *executionContext) _Query_subjects(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Subjects(rctx, fc.Args["title"].(*string), fc.Args["department"].(*string))
+		return ec.resolvers.Query().Subjects(rctx, fc.Args["title"].(*string), fc.Args["faculty"].(*string), fc.Args["academicField"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -51,3 +51,17 @@ func (sI *SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
 	}
 	return subjectDTOs, nil
 }
+
+func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, academicField string) ([]*dto.SubjectDTO, error) {
+
+	subjects, err := sI.sR.GetBySearchParameter(title, faculty, academicField)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` of SubjectRepository: %w", err)
+	}
+
+	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
+	for i, subject := range subjects {
+		subjectDTOs[i] = dto.NewSubjectDTO(subject)
+	}
+	return subjectDTOs, nil
+}
