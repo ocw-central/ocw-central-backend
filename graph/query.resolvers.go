@@ -27,12 +27,7 @@ func (r *queryResolver) Subjects(ctx context.Context, title *string, faculty *st
 	if title == nil && faculty == nil && academicField == nil {
 		return nil, fmt.Errorf("at least one of the parameters must be specified")
 	}
-	subjectSearchParameter := utils.SubjectSearchParameter{
-		Title:         utils.ConvertNilToZeroValue(title),
-		Faculty:       utils.ConvertNilToZeroValue(faculty),
-		AcademicField: utils.ConvertNilToZeroValue(academicField),
-	}
-	subjects, err := r.sbU.GetBySearchParameter(subjectSearchParameter)
+	subjects, err := r.sbU.GetBySearchParameter(utils.ConvertNilToZeroValue(title), utils.ConvertNilToZeroValue(faculty), utils.ConvertNilToZeroValue(academicField))
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` func of SubjectUsecase: %w", err)
 	}

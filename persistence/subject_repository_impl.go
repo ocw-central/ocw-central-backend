@@ -140,7 +140,7 @@ func (sR *SubjectRepositoryImpl) GetByIds(ids []model.SubjectId) ([]*model.Subje
 	return subjects, nil
 }
 
-func (sR SubjectRepositoryImpl) GetBySearchParameter(searchParameter utils.SubjectSearchParameter) ([]*model.Subject, error) {
+func (sR SubjectRepositoryImpl) GetBySearchParameter(title string, faculty string, academicField string) ([]*model.Subject, error) {
 	subjectDTOs := make([]dto.SubjectDTO, 0)
 	subjectSQL := `
 		SELECT
@@ -164,32 +164,31 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(searchParameter utils.Subje
 	// Assemble named prepared statement(subjectSQL) and parameters
 	searchQuery := ""
 	parameters := map[string]interface{}{}
-	// for positional arg index
-	// for Title
-	if searchParameter.Title != "" {
+
+	if title != "" {
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
 		searchQuery += "title LIKE " + ":title"
-		parameters["title"] = "%" + searchParameter.Title + "%"
+		parameters["title"] = "%" + title + "%"
 
 	}
-	// for Faculty
-	if searchParameter.Faculty != "" {
+
+	if faculty != "" {
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
 		searchQuery += "subjects.faculty LIKE " + ":faculty"
-		parameters["faculty"] = "%" + searchParameter.Faculty + "%"
+		parameters["faculty"] = "%" + faculty + "%"
 
 	}
-	// for AcademicField
-	if searchParameter.AcademicField != "" {
+	// Only perfevt matching is used for academic field
+	if academicField != "" {
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "academic_field LIKE " + ":academic_field"
-		parameters["academic_field"] = "%" + searchParameter.AcademicField + "%"
+		searchQuery += "academic_field = " + ":academic_field"
+		parameters["academic_field"] = academicField
 
 	}
 	// add WHERE prefix to searchQuery
@@ -203,23 +202,13 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(searchParameter utils.Subje
 		return nil, fmt.Errorf("failed to prepare statement: %w", err)
 	}
 	// execute statement
-	rows, err := stmt.Queryx(parameters)
-	if err != nil {
+	if err := stmt.Select(&subjectDTOs, parameters); err != nil {
 		return nil, fmt.Errorf("failed to execute statement: %w", err)
-	}
-	// scan rows
-	for rows.Next() {
-		subjectDTO := dto.SubjectDTO{}
-		err := rows.StructScan(&subjectDTO)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", err)
-		}
-		subjectDTOs = append(subjectDTOs, subjectDTO)
 	}
 
 	subjects := make([]*model.Subject, 0)
 	for _, subjectDTO := range subjectDTOs {
-		subject, err := sR.convertSubjectDTOToSubject(subjectDTO)
+		subject, err := sR.getSubjectFromDto(subjectDTO)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert `subjectDTO` to `subject`: %w", err)
 		}
@@ -229,7 +218,7 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(searchParameter utils.Subje
 }
 
 // fixme: this causes N+1 query problem
-func (sR SubjectRepositoryImpl) convertSubjectDTOToSubject(subjectDTO dto.SubjectDTO) (*model.Subject, error) {
+func (sR SubjectRepositoryImpl) getSubjectFromDto(subjectDTO dto.SubjectDTO) (*model.Subject, error) {
 	// get videos from videos table
 	videoIdDTOs := []struct{ Id *[]byte }{}
 	// get resources from resources table
