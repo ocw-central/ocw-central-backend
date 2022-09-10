@@ -37,27 +37,7 @@ func (sI *VideoInteractor) GetByIds(ids []string) ([]*dto.VideoDTO, error) {
 
 	videoDTOs := make([]*dto.VideoDTO, len(videos))
 	for i, video := range videos {
-		chapterDTOs := make([]dto.ChapterDTO, len(video.Chapters()))
-		for j, chapter := range video.Chapters() {
-			chapterDTOs[j] = dto.ChapterDTO{
-				ID:            chapter.Id().String(),
-				StartAt:       chapter.StartAt(),
-				Topic:         chapter.Topic(),
-				ThumbnailLink: chapter.ThumbnailLink(),
-			}
-		}
-
-		videoDTOs[i] = &dto.VideoDTO{
-			ID:          video.Id().String(),
-			Title:       video.Title(),
-			Ordering:    video.Ordering(),
-			Link:        video.Link(),
-			Chapters:    chapterDTOs,
-			Faculty:     video.Faculty(),
-			LecturedOn:  video.LecturedOn(),
-			VideoLength: int(video.VideoLength().Seconds()),
-			Language:    video.Language(),
-		}
+		videoDTOs[i] = dto.NewVideoDTO(video)
 	}
 	return videoDTOs, nil
 }
