@@ -37,13 +37,7 @@ func (sI *ResourceInteractor) GetByIds(ids []string) ([]*dto.ResourceDTO, error)
 
 	resourceDTOs := make([]*dto.ResourceDTO, len(resources))
 	for i, resource := range resources {
-		resourceDTOs[i] = &dto.ResourceDTO{
-			ID:          resource.Id().String(),
-			Title:       resource.Title(),
-			Ordering:    resource.Ordering(),
-			Description: resource.Description(),
-			Link:        resource.Link(),
-		}
+		resourceDTOs[i] = dto.NewResourceDTO(resource)
 	}
 	return resourceDTOs, nil
 }
