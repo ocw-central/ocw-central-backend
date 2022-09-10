@@ -42,6 +42,10 @@ func NewResourceFromRepository(
 	link string,
 ) *Resource {
 	return &Resource{
-		id, title, ordering, description, link,
+		id:          id,
+		title:       title,
+		ordering:    ordering,
+		description: description,
+		link:        link,
 	}
 }

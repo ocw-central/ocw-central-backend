@@ -27,7 +27,7 @@ func (sI *SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 		return nil, fmt.Errorf("failed on executing `GetById` of SubjectRepository: %w", err)
 	}
 
-	return convertModelToDTO(subject), nil
+	return dto.NewSubjectDTO(subject), nil
 }
 
 func (sI *SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
@@ -47,7 +47,7 @@ func (sI *SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
 
 	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
 	for i, subject := range subjects {
-		subjectDTOs[i] = convertModelToDTO(subject)
+		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
 	return subjectDTOs, nil
 }
@@ -61,50 +61,7 @@ func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, a
 
 	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
 	for i, subject := range subjects {
-		subjectDTOs[i] = convertModelToDTO(subject)
+		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
 	return subjectDTOs, nil
-}
-
-func convertModelToDTO(subject *model.Subject) *dto.SubjectDTO {
-	videoIds := subject.VideoIds()
-	videoIdStrs := make([]string, len(videoIds))
-	for i, videoId := range videoIds {
-		videoIdStrs[i] = videoId.String()
-	}
-
-	resourceIds := subject.ResourceIds()
-	resourceIdStrs := make([]string, len(resourceIds))
-	for i, resourceId := range resourceIds {
-		resourceIdStrs[i] = resourceId.String()
-	}
-
-	relatedSubjectIds := subject.RelatedSubjectIds()
-	relatedSubjectIdStrs := make([]string, len(relatedSubjectIds))
-	for i, relatedSubjectId := range relatedSubjectIds {
-		relatedSubjectIdStrs[i] = relatedSubjectId.String()
-	}
-
-	var syllabusId string
-	if subject.SyllabusId() != nil {
-		syllabusId = subject.SyllabusId().String()
-	}
-
-	return &dto.SubjectDTO{
-		ID:                subject.Id().String(),
-		Category:          subject.Category(),
-		Title:             subject.Title(),
-		VideoIds:          videoIdStrs,
-		Location:          subject.Location(),
-		ResourceIds:       resourceIdStrs,
-		RelatedSubjectIds: relatedSubjectIdStrs,
-		Department:        subject.Department(),
-		FirstHeldOn:       subject.FirstHeldOn(),
-		Faculty:           subject.Faculty(),
-		Language:          subject.Language(),
-		FreeDescription:   subject.FreeDescription(),
-		SyllabusId:        syllabusId,
-		Series:            subject.Series(),
-		AcademicField:     subject.AcademicField(),
-	}
 }

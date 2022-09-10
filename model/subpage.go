@@ -31,6 +31,7 @@ func NewSubpageFromRepository(
 	content string,
 ) *Subpage {
 	return &Subpage{
-		id, content,
+		id:      id,
+		content: content,
 	}
 }

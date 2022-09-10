@@ -65,8 +65,22 @@ func NewSubjectFromRepository(
 	academicField string,
 	thumbnailLink string,
 ) *Subject {
-	return &Subject{id, category, title, videoIds, location, resourceIds,
-		relatedSubjectIds, department, firstHeldOn, faculty, language,
-		freeDescription, syllabusId, series, academicField, thumbnailLink,
+	return &Subject{
+		id:                id,
+		category:          category,
+		title:             title,
+		videoIds:          videoIds,
+		location:          location,
+		resourceIds:       resourceIds,
+		relatedSubjectIds: relatedSubjectIds,
+		department:        department,
+		firstHeldOn:       firstHeldOn,
+		faculty:           faculty,
+		language:          language,
+		freeDescription:   freeDescription,
+		syllabusId:        syllabusId,
+		series:            series,
+		academicField:     academicField,
+		thumbnailLink:     thumbnailLink,
 	}
 }

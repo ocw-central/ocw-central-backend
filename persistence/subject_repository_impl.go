@@ -101,8 +101,6 @@ func (sR *SubjectRepositoryImpl) GetById(id model.SubjectId) (*model.Subject, er
 		if err != nil {
 			return nil, fmt.Errorf("failed to create `syllabusId`: %w", err)
 		}
-	} else {
-		syllabusId = nil
 	}
 
 	subject := model.NewSubjectFromRepository(
