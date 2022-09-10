@@ -52,7 +52,14 @@ func NewVideoFromRepository(
 	language string,
 ) *Video {
 	return &Video{
-		id, title, ordering, link, chapters, faculty,
-		lecturedOn, videoLength, language,
+		id:          id,
+		title:       title,
+		ordering:    ordering,
+		link:        link,
+		chapters:    chapters,
+		faculty:     faculty,
+		lecturedOn:  lecturedOn,
+		videoLength: videoLength,
+		language:    language,
 	}
 }
