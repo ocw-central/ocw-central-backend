@@ -12,11 +12,11 @@ type SubjectInteractor struct {
 	sR repository.SubjectRepository
 }
 
-func NewSubjectInteractor(sR repository.SubjectRepository) SubjectInteractor {
-	return SubjectInteractor{sR}
+func NewSubjectInteractor(sR repository.SubjectRepository) *SubjectInteractor {
+	return &SubjectInteractor{sR}
 }
 
-func (sI SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
+func (sI *SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 	subjectId, err := model.NewSubjectId(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed on create `SubjectId` struct: %w", err)
@@ -27,45 +27,41 @@ func (sI SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
 		return nil, fmt.Errorf("failed on executing `GetById` of SubjectRepository: %w", err)
 	}
 
-	videoIds := subject.VideoIds()
-	videoIdStrs := make([]string, len(videoIds))
-	for i, videoId := range videoIds {
-		videoIdStrs[i] = videoId.String()
+	return dto.NewSubjectDTO(subject), nil
+}
+
+func (sI *SubjectInteractor) GetByIds(ids []string) ([]*dto.SubjectDTO, error) {
+	subjectIds := make([]model.SubjectId, len(ids))
+	for i, id := range ids {
+		subjectId, err := model.NewSubjectId(id)
+		if err != nil {
+			return nil, fmt.Errorf("failed on create `SubjectId`: %w", err)
+		}
+		subjectIds[i] = *subjectId
 	}
 
-	resourceIds := subject.ResourceIds()
-	resourceIdStrs := make([]string, len(resourceIds))
-	for i, resourceId := range resourceIds {
-		resourceIdStrs[i] = resourceId.String()
+	subjects, err := sI.sR.GetByIds(subjectIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByIds` of SubjectRepository: %w", err)
 	}
 
-	relatedSubjectIds := subject.RelatedSubjectIds()
-	relatedSubjectIdStrs := make([]string, len(relatedSubjectIds))
-	for i, relatedSubjectId := range relatedSubjectIds {
-		relatedSubjectIdStrs[i] = relatedSubjectId.String()
+	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
+	for i, subject := range subjects {
+		subjectDTOs[i] = dto.NewSubjectDTO(subject)
+	}
+	return subjectDTOs, nil
+}
+
+func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, academicField string) ([]*dto.SubjectDTO, error) {
+
+	subjects, err := sI.sR.GetBySearchParameter(title, faculty, academicField)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` of SubjectRepository: %w", err)
 	}
 
-	var syllabusId string
-	if subject.SyllabusId() != nil {
-		syllabusId = subject.SyllabusId().String()
+	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
+	for i, subject := range subjects {
+		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
-
-	subjectDTO := dto.SubjectDTO{
-		ID:                subject.Id().String(),
-		Category:          subject.Category(),
-		Title:             subject.Title(),
-		VideoIds:          videoIdStrs,
-		Location:          subject.Location(),
-		ResourceIds:       resourceIdStrs,
-		RelatedSubjectIds: relatedSubjectIdStrs,
-		Department:        subject.Department(),
-		FirstHeldOn:       subject.FirstHeldOn(),
-		Faculty:           subject.Faculty(),
-		Language:          subject.Language(),
-		FreeDescription:   subject.FreeDescription(),
-		SyllabusId:        syllabusId,
-		Series:            subject.Series(),
-		AcademicField:     subject.AcademicField(),
-	}
-	return &subjectDTO, nil
+	return subjectDTOs, nil
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/kafugen/ocwcentral/graph/model"
+	graph "github.com/kafugen/ocwcentral/graph/scalar"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -45,6 +46,10 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AcademicField struct {
+		Name func(childComplexity int) int
+	}
+
 	Chapter struct {
 		ID            func(childComplexity int) int
 		StartAt       func(childComplexity int) int
@@ -53,8 +58,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Subject  func(childComplexity int, id string) int
-		Subjects func(childComplexity int, title *string, department *string) int
+		AcademicFields func(childComplexity int) int
+		Subject        func(childComplexity int, id string) int
+		Subjects       func(childComplexity int, title *string, faculty *string, academicField *string) int
 	}
 
 	RelatedSubject struct {
@@ -111,9 +117,9 @@ type ComplexityRoot struct {
 	Syllabus struct {
 		AcademicYear      func(childComplexity int) int
 		AssignedGrade     func(childComplexity int) int
-		CourceDayPeriod   func(childComplexity int) int
-		CourceFormat      func(childComplexity int) int
-		CourceRequirement func(childComplexity int) int
+		CourseDayPeriod   func(childComplexity int) int
+		CourseFormat      func(childComplexity int) int
+		CourseRequirement func(childComplexity int) int
 		Faculty           func(childComplexity int) int
 		GradingMethod     func(childComplexity int) int
 		ID                func(childComplexity int) int
@@ -146,7 +152,8 @@ type ComplexityRoot struct {
 
 type QueryResolver interface {
 	Subject(ctx context.Context, id string) (*model.Subject, error)
-	Subjects(ctx context.Context, title *string, department *string) ([]*model.Subject, error)
+	Subjects(ctx context.Context, title *string, faculty *string, academicField *string) ([]*model.Subject, error)
+	AcademicFields(ctx context.Context) ([]*model.AcademicField, error)
 }
 type SubjectResolver interface {
 	Videos(ctx context.Context, obj *model.Subject) ([]*model.Video, error)
@@ -171,6 +178,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AcademicField.name":
+		if e.complexity.AcademicField.Name == nil {
+			break
+		}
+
+		return e.complexity.AcademicField.Name(childComplexity), true
 
 	case "Chapter.id":
 		if e.complexity.Chapter.ID == nil {
@@ -200,6 +214,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Chapter.Topic(childComplexity), true
 
+	case "Query.academicFields":
+		if e.complexity.Query.AcademicFields == nil {
+			break
+		}
+
+		return e.complexity.Query.AcademicFields(childComplexity), true
+
 	case "Query.subject":
 		if e.complexity.Query.Subject == nil {
 			break
@@ -222,7 +243,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Subjects(childComplexity, args["title"].(*string), args["department"].(*string)), true
+		return e.complexity.Query.Subjects(childComplexity, args["title"].(*string), args["faculty"].(*string), args["academicField"].(*string)), true
 
 	case "RelatedSubject.academicField":
 		if e.complexity.RelatedSubject.AcademicField == nil {
@@ -511,26 +532,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Syllabus.AssignedGrade(childComplexity), true
 
-	case "Syllabus.courceDayPeriod":
-		if e.complexity.Syllabus.CourceDayPeriod == nil {
+	case "Syllabus.courseDayPeriod":
+		if e.complexity.Syllabus.CourseDayPeriod == nil {
 			break
 		}
 
-		return e.complexity.Syllabus.CourceDayPeriod(childComplexity), true
+		return e.complexity.Syllabus.CourseDayPeriod(childComplexity), true
 
-	case "Syllabus.courceFormat":
-		if e.complexity.Syllabus.CourceFormat == nil {
+	case "Syllabus.courseFormat":
+		if e.complexity.Syllabus.CourseFormat == nil {
 			break
 		}
 
-		return e.complexity.Syllabus.CourceFormat(childComplexity), true
+		return e.complexity.Syllabus.CourseFormat(childComplexity), true
 
-	case "Syllabus.courceRequirement":
-		if e.complexity.Syllabus.CourceRequirement == nil {
+	case "Syllabus.courseRequirement":
+		if e.complexity.Syllabus.CourseRequirement == nil {
 			break
 		}
 
-		return e.complexity.Syllabus.CourceRequirement(childComplexity), true
+		return e.complexity.Syllabus.CourseRequirement(childComplexity), true
 
 	case "Syllabus.faculty":
 		if e.complexity.Syllabus.Faculty == nil {
@@ -752,6 +773,11 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
+	{Name: "../schemas/academic_field.graphqls", Input: `type AcademicField {
+  name: String!
+}
+
+`, BuiltIn: false},
 	{Name: "../schemas/chapter.graphqls", Input: `type Chapter implements Node {
   id: ID!
   startAt: Int!
@@ -766,7 +792,8 @@ var sources = []*ast.Source{
 	{Name: "../schemas/mutation.graphqls", Input: ``, BuiltIn: false},
 	{Name: "../schemas/query.graphqls", Input: `type Query {
   subject(id: ID!): Subject!
-  subjects(title: String, department: String, ): [Subject!]!
+  subjects(title: String, faculty: String, academicField: String): [Subject!]!
+  academicFields: [AcademicField!]!
 }
 `, BuiltIn: false},
 	{Name: "../schemas/related_subject.graphqls", Input: `type RelatedSubject implements Node {
@@ -808,11 +835,11 @@ scalar Time
   resources: [Resource!]!
   relatedSubjects: [RelatedSubject!]!
   department: String!
-  firstHeldOn: Time!
+  firstHeldOn: Time
   faculty: String!
   language: String!
   freeDescription: String!
-  syllabus: Syllabus!
+  syllabus: Syllabus
   series: String!
   academicField: String!
   thumbnailLink: String!
@@ -831,15 +858,15 @@ scalar Time
   academicYear: Int!
   semester: String!
   numCredit: Int!
-  courceFormat: String!
+  courseFormat: String!
   assignedGrade: String!
   targetedAudience: String!
-  courceDayPeriod: String!
+  courseDayPeriod: String!
   outline: String!
   objective: String!
   lessonPlan: String!
   gradingMethod: String!
-  courceRequirement: String!
+  courseRequirement: String!
   outClassLearning: String!
   reference: String!
   remark: String!
@@ -908,14 +935,23 @@ func (ec *executionContext) field_Query_subjects_args(ctx context.Context, rawAr
 	}
 	args["title"] = arg0
 	var arg1 *string
-	if tmp, ok := rawArgs["department"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("department"))
+	if tmp, ok := rawArgs["faculty"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("faculty"))
 		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["department"] = arg1
+	args["faculty"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["academicField"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("academicField"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["academicField"] = arg2
 	return args, nil
 }
 
@@ -956,6 +992,50 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AcademicField_name(ctx context.Context, field graphql.CollectedField, obj *model.AcademicField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AcademicField_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AcademicField_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AcademicField",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Chapter_id(ctx context.Context, field graphql.CollectedField, obj *model.Chapter) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Chapter_id(ctx, field)
@@ -1236,7 +1316,7 @@ func (ec *executionContext) _Query_subjects(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Subjects(rctx, fc.Args["title"].(*string), fc.Args["department"].(*string))
+		return ec.resolvers.Query().Subjects(rctx, fc.Args["title"].(*string), fc.Args["faculty"].(*string), fc.Args["academicField"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1307,6 +1387,54 @@ func (ec *executionContext) fieldContext_Query_subjects(ctx context.Context, fie
 	if fc.Args, err = ec.field_Query_subjects_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_academicFields(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_academicFields(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AcademicFields(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AcademicField)
+	fc.Result = res
+	return ec.marshalNAcademicField2ᚕᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicFieldᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_academicFields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_AcademicField_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AcademicField", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -2803,14 +2931,11 @@ func (ec *executionContext) _Subject_firstHeldOn(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Subject_firstHeldOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2979,14 +3104,11 @@ func (ec *executionContext) _Subject_syllabus(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Syllabus)
 	fc.Result = res
-	return ec.marshalNSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx, field.Selections, res)
+	return ec.marshalOSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Subject_syllabus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3011,14 +3133,14 @@ func (ec *executionContext) fieldContext_Subject_syllabus(ctx context.Context, f
 				return ec.fieldContext_Syllabus_semester(ctx, field)
 			case "numCredit":
 				return ec.fieldContext_Syllabus_numCredit(ctx, field)
-			case "courceFormat":
-				return ec.fieldContext_Syllabus_courceFormat(ctx, field)
+			case "courseFormat":
+				return ec.fieldContext_Syllabus_courseFormat(ctx, field)
 			case "assignedGrade":
 				return ec.fieldContext_Syllabus_assignedGrade(ctx, field)
 			case "targetedAudience":
 				return ec.fieldContext_Syllabus_targetedAudience(ctx, field)
-			case "courceDayPeriod":
-				return ec.fieldContext_Syllabus_courceDayPeriod(ctx, field)
+			case "courseDayPeriod":
+				return ec.fieldContext_Syllabus_courseDayPeriod(ctx, field)
 			case "outline":
 				return ec.fieldContext_Syllabus_outline(ctx, field)
 			case "objective":
@@ -3027,8 +3149,8 @@ func (ec *executionContext) fieldContext_Subject_syllabus(ctx context.Context, f
 				return ec.fieldContext_Syllabus_lessonPlan(ctx, field)
 			case "gradingMethod":
 				return ec.fieldContext_Syllabus_gradingMethod(ctx, field)
-			case "courceRequirement":
-				return ec.fieldContext_Syllabus_courceRequirement(ctx, field)
+			case "courseRequirement":
+				return ec.fieldContext_Syllabus_courseRequirement(ctx, field)
 			case "outClassLearning":
 				return ec.fieldContext_Syllabus_outClassLearning(ctx, field)
 			case "reference":
@@ -3466,9 +3588,9 @@ func (ec *executionContext) _Syllabus_academicYear(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(int16)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNInt2int16(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Syllabus_academicYear(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3554,9 +3676,9 @@ func (ec *executionContext) _Syllabus_numCredit(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(int8)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNInt2int8(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Syllabus_numCredit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3572,8 +3694,8 @@ func (ec *executionContext) fieldContext_Syllabus_numCredit(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Syllabus_courceFormat(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Syllabus_courceFormat(ctx, field)
+func (ec *executionContext) _Syllabus_courseFormat(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Syllabus_courseFormat(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3586,7 +3708,7 @@ func (ec *executionContext) _Syllabus_courceFormat(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CourceFormat, nil
+		return obj.CourseFormat, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3603,7 +3725,7 @@ func (ec *executionContext) _Syllabus_courceFormat(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Syllabus_courceFormat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Syllabus_courseFormat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
@@ -3704,8 +3826,8 @@ func (ec *executionContext) fieldContext_Syllabus_targetedAudience(ctx context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _Syllabus_courceDayPeriod(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Syllabus_courceDayPeriod(ctx, field)
+func (ec *executionContext) _Syllabus_courseDayPeriod(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Syllabus_courseDayPeriod(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3718,7 +3840,7 @@ func (ec *executionContext) _Syllabus_courceDayPeriod(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CourceDayPeriod, nil
+		return obj.CourseDayPeriod, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3735,7 +3857,7 @@ func (ec *executionContext) _Syllabus_courceDayPeriod(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Syllabus_courceDayPeriod(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Syllabus_courseDayPeriod(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
@@ -3924,8 +4046,8 @@ func (ec *executionContext) fieldContext_Syllabus_gradingMethod(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Syllabus_courceRequirement(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Syllabus_courceRequirement(ctx, field)
+func (ec *executionContext) _Syllabus_courseRequirement(ctx context.Context, field graphql.CollectedField, obj *model.Syllabus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Syllabus_courseRequirement(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3938,7 +4060,7 @@ func (ec *executionContext) _Syllabus_courceRequirement(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CourceRequirement, nil
+		return obj.CourseRequirement, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3955,7 +4077,7 @@ func (ec *executionContext) _Syllabus_courceRequirement(ctx context.Context, fie
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Syllabus_courceRequirement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Syllabus_courseRequirement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Syllabus",
 		Field:      field,
@@ -6395,6 +6517,34 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 // region    **************************** object.gotpl ****************************
 
+var academicFieldImplementors = []string{"AcademicField"}
+
+func (ec *executionContext) _AcademicField(ctx context.Context, sel ast.SelectionSet, obj *model.AcademicField) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, academicFieldImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AcademicField")
+		case "name":
+
+			out.Values[i] = ec._AcademicField_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var chapterImplementors = []string{"Chapter", "Node"}
 
 func (ec *executionContext) _Chapter(ctx context.Context, sel ast.SelectionSet, obj *model.Chapter) graphql.Marshaler {
@@ -6496,6 +6646,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_subjects(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "academicFields":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_academicFields(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -6830,9 +7003,6 @@ func (ec *executionContext) _Subject(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Subject_firstHeldOn(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "faculty":
 
 			out.Values[i] = ec._Subject_faculty(ctx, field, obj)
@@ -6864,9 +7034,6 @@ func (ec *executionContext) _Subject(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Subject_syllabus(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -7000,9 +7167,9 @@ func (ec *executionContext) _Syllabus(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "courceFormat":
+		case "courseFormat":
 
-			out.Values[i] = ec._Syllabus_courceFormat(ctx, field, obj)
+			out.Values[i] = ec._Syllabus_courseFormat(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -7021,9 +7188,9 @@ func (ec *executionContext) _Syllabus(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "courceDayPeriod":
+		case "courseDayPeriod":
 
-			out.Values[i] = ec._Syllabus_courceDayPeriod(ctx, field, obj)
+			out.Values[i] = ec._Syllabus_courseDayPeriod(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -7056,9 +7223,9 @@ func (ec *executionContext) _Syllabus(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "courceRequirement":
+		case "courseRequirement":
 
-			out.Values[i] = ec._Syllabus_courceRequirement(ctx, field, obj)
+			out.Values[i] = ec._Syllabus_courseRequirement(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -7504,6 +7671,60 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAcademicField2ᚕᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicFieldᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AcademicField) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAcademicField2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicField(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAcademicField2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐAcademicField(ctx context.Context, sel ast.SelectionSet, v *model.AcademicField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AcademicField(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7621,6 +7842,36 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
 	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int16(ctx context.Context, v interface{}) (int16, error) {
+	res, err := graph.UnmarshalInt16(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int16(ctx context.Context, sel ast.SelectionSet, v int16) graphql.Marshaler {
+	res := graph.MarshalInt16(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int8(ctx context.Context, v interface{}) (int8, error) {
+	res, err := graph.UnmarshalInt8(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int8(ctx context.Context, sel ast.SelectionSet, v int8) graphql.Marshaler {
+	res := graph.MarshalInt8(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -7856,20 +8107,6 @@ func (ec *executionContext) marshalNSubpage2ᚕgithubᚗcomᚋkafugenᚋocwcentr
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalNSyllabus2githubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx context.Context, sel ast.SelectionSet, v model.Syllabus) graphql.Marshaler {
-	return ec._Syllabus(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx context.Context, sel ast.SelectionSet, v *model.Syllabus) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Syllabus(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
@@ -8233,6 +8470,23 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) marshalOSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSyllabus(ctx context.Context, sel ast.SelectionSet, v *model.Syllabus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Syllabus(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
 	return res
 }
 

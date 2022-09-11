@@ -23,5 +23,15 @@ func (s SubpageId) String() string {
 
 type Subpage struct {
 	id      SubpageId `desc:"ID"`
-	content string    `desc:"内容テキスト"`
+	content string    `desc:"ページ内容"`
+}
+
+func NewSubpageFromRepository(
+	id SubpageId,
+	content string,
+) *Subpage {
+	return &Subpage{
+		id:      id,
+		content: content,
+	}
 }

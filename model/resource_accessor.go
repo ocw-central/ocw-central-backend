@@ -9,7 +9,7 @@ func (r *Resource) Title() string {
 func (r *Resource) Ordering() int {
 	return r.ordering
 }
-func (r *Resource) Descripti() string {
+func (r *Resource) Description() string {
 	return r.description
 }
 func (r *Resource) Link() string {
