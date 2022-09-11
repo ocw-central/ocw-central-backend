@@ -776,6 +776,7 @@ var sources = []*ast.Source{
 	{Name: "../schemas/academic_field.graphqls", Input: `type AcademicField {
   name: String!
 }
+
 `, BuiltIn: false},
 	{Name: "../schemas/chapter.graphqls", Input: `type Chapter implements Node {
   id: ID!
@@ -834,7 +835,7 @@ scalar Time
   resources: [Resource!]!
   relatedSubjects: [RelatedSubject!]!
   department: String!
-  firstHeldOn: Time!
+  firstHeldOn: Time
   faculty: String!
   language: String!
   freeDescription: String!
@@ -2930,14 +2931,11 @@ func (ec *executionContext) _Subject_firstHeldOn(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Subject_firstHeldOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7005,9 +7003,6 @@ func (ec *executionContext) _Subject(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Subject_firstHeldOn(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "faculty":
 
 			out.Values[i] = ec._Subject_faculty(ctx, field, obj)
@@ -8483,6 +8478,16 @@ func (ec *executionContext) marshalOSyllabus2ᚖgithubᚗcomᚋkafugenᚋocwcent
 		return graphql.Null
 	}
 	return ec._Syllabus(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
+	return res
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
