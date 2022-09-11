@@ -15,11 +15,15 @@ type VideoRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func NewVideoRepositoryImpl(db *sqlx.DB) VideoRepositoryImpl {
-	return VideoRepositoryImpl{db}
+func NewVideoRepositoryImpl(db *sqlx.DB) *VideoRepositoryImpl {
+	return &VideoRepositoryImpl{db}
 }
 
-func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, error) {
+func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
 	videoIdBytes := make([]interface{}, len(ids))
 	for i, id := range ids {
 		videoIdBytes[i] = id.ByteSlice()
@@ -51,8 +55,8 @@ func (vR VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, err
 		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
 	}
 
-	videos := make([]*model.Video, len(ids))
 	rowIndex := 0
+	videos := make([]*model.Video, len(ids))
 	for ordering := 0; ordering < len(ids); ordering++ {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
 

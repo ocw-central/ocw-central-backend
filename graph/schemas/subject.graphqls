@@ -7,11 +7,11 @@ type Subject implements Node {
   resources: [Resource!]!
   relatedSubjects: [RelatedSubject!]!
   department: String!
-  firstHeldOn: Time!
+  firstHeldOn: Time
   faculty: String!
   language: String!
   freeDescription: String!
-  syllabus: Syllabus!
+  syllabus: Syllabus
   series: String!
   academicField: String!
   thumbnailLink: String!
