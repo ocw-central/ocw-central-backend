@@ -2,6 +2,9 @@ package interactor
 
 import (
 	"fmt"
+	"time"
+
+	"github.com/patrickmn/go-cache"
 
 	"github.com/kafugen/ocwcentral/domain/repository"
 	"github.com/kafugen/ocwcentral/domain/usecase/dto"
@@ -10,14 +13,22 @@ import (
 
 const (
 	numRandomSubjects = 12
+
+	// this value is used for GetByRandom() cache
+	cacheDefaultExpiration = 2 * time.Hour
+	cacheCleanupInterval   = 24 * time.Hour
 )
 
 type SubjectInteractor struct {
-	sR repository.SubjectRepository
+	sR                 repository.SubjectRepository
+	randomSubjectCache *cache.Cache
 }
 
 func NewSubjectInteractor(sR repository.SubjectRepository) *SubjectInteractor {
-	return &SubjectInteractor{sR}
+	return &SubjectInteractor{
+		sR:                 sR,
+		randomSubjectCache: cache.New(cacheDefaultExpiration, cacheCleanupInterval),
+	}
 }
 
 func (sI *SubjectInteractor) GetById(id string) (*dto.SubjectDTO, error) {
@@ -71,6 +82,12 @@ func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, a
 }
 
 func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
+	if cache, found := sI.randomSubjectCache.Get("random-subjects"); found {
+		if subjects, ok := cache.([]*dto.SubjectDTO); ok {
+			return subjects, nil
+		}
+	}
+
 	subjects, err := sI.sR.GetByRandom(numRandomSubjects)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByRandom` of SubjectRepository: %w", err)
@@ -81,5 +98,6 @@ func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
 		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
 
+	sI.randomSubjectCache.Set("random-subjects", subjectDTOs, cache.DefaultExpiration)
 	return subjectDTOs, nil
 }
