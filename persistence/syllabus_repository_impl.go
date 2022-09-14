@@ -102,7 +102,12 @@ func (sR *SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syl
 			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Remark),
 			subpages,
 		)
-		rowIndex += len(subpages)
+
+		if len(subpages) == 0 {
+			rowIndex++
+		} else{
+			rowIndex += len(subpages)
+		}
 	}
 	return syllabuses, nil
 }
@@ -119,14 +124,20 @@ func getSubpages(syllabusSubpageDTOs []dto.SyllabusSubpageDTO) ([]model.Subpage,
 	subpages := make([]model.Subpage, 0, 20)
 
 	for rowIndex < len(syllabusSubpageDTOs) && bytes.Equal(*syllabusSubpageDTOs[0].Id, *syllabusSubpageDTOs[rowIndex].Id) {
-		subpageId, err := model.NewSubpageId(*syllabusSubpageDTOs[rowIndex].SubpageId)
+		syllabusSubpageDTO := syllabusSubpageDTOs[rowIndex]
+
+		if syllabusSubpageDTO.SubpageId == nil {
+			return subpages, nil
+		}
+
+		subpageId, err := model.NewSubpageId(*syllabusSubpageDTO.SubpageId)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create `subpageId`: %w", err)
 		}
 
 		subpages = append(subpages, *model.NewSubpageFromRepository(
 			*subpageId,
-			utils.ConvertNilToZeroValue(syllabusSubpageDTOs[rowIndex].Content),
+			utils.ConvertNilToZeroValue(syllabusSubpageDTO.Content),
 		))
 		rowIndex++
 	}
