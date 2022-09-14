@@ -299,3 +299,42 @@ func (sR SubjectRepositoryImpl) getSubjectFromDto(subjectDTO dto.SubjectDTO) (*m
 
 	return subject, nil
 }
+
+// WARNING: This method become slower as the number of subjects increases due to LIMIT clause.
+// This also causes N+1 query problem.
+func (sR SubjectRepositoryImpl) GetByRandom(numSubjects int) ([]*model.Subject, error) {
+	sql := `
+		SELECT
+			subjects.id,
+			category,
+			title,
+			location,
+			department,
+			first_held_on,
+			subjects.faculty,
+			subjects.language,
+			free_description,
+			series,
+			academic_field,
+			syllabuses.id AS syllabus_id,
+			thumbnail_link
+		FROM subjects
+		LEFT JOIN syllabuses
+		ON subjects.id = syllabuses.subject_id
+		ORDER BY RAND() LIMIT ?
+	`
+	subjectDTOs := []dto.SubjectDTO{}
+	if err := sR.db.Select(&subjectDTOs, sql, numSubjects); err != nil {
+		return nil, fmt.Errorf("failed to select `subjects` table : %w", err)
+	}
+
+	subjects := make([]*model.Subject, len(subjectDTOs))
+	for i, subjectDTO := range subjectDTOs {
+		subject, err := sR.getSubjectFromDto(subjectDTO)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert `subjectDTO` to `subject`: %w", err)
+		}
+		subjects[i] = subject
+	}
+	return subjects, nil
+}

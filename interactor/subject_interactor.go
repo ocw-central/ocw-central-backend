@@ -8,6 +8,10 @@ import (
 	"github.com/kafugen/ocwcentral/model"
 )
 
+const (
+	numRandomSubjects = 12
+)
+
 type SubjectInteractor struct {
 	sR repository.SubjectRepository
 }
@@ -63,5 +67,19 @@ func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, a
 	for i, subject := range subjects {
 		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
+	return subjectDTOs, nil
+}
+
+func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
+	subjects, err := sI.sR.GetByRandom(numRandomSubjects)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByRandom` of SubjectRepository: %w", err)
+	}
+
+	subjectDTOs := make([]*dto.SubjectDTO, len(subjects))
+	for i, subject := range subjects {
+		subjectDTOs[i] = dto.NewSubjectDTO(subject)
+	}
+
 	return subjectDTOs, nil
 }
