@@ -1,5 +1,5 @@
 type Query {
   subject(id: ID!): Subject!
-  subjects(title: String, faculty: String, academicField: String): [Subject!]!
+  subjects(title: String!, faculty: String!, academicField: String!): [Subject!]!
   academicFields: [AcademicField!]!
 }
