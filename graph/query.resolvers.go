@@ -9,7 +9,6 @@ import (
 
 	"github.com/kafugen/ocwcentral/graph/generated"
 	"github.com/kafugen/ocwcentral/graph/model"
-	"github.com/kafugen/ocwcentral/utils"
 )
 
 // Subject is the resolver for the subject field.
@@ -23,11 +22,11 @@ func (r *queryResolver) Subject(ctx context.Context, id string) (*model.Subject,
 }
 
 // Subjects is the resolver for the subjects field.
-func (r *queryResolver) Subjects(ctx context.Context, title *string, faculty *string, academicField *string) ([]*model.Subject, error) {
-	if title == nil && faculty == nil && academicField == nil {
+func (r *queryResolver) Subjects(ctx context.Context, title string, faculty string, academicField string) ([]*model.Subject, error) {
+	if title == "" && faculty == "" && academicField == "" {
 		return nil, fmt.Errorf("at least one of the parameters must be specified")
 	}
-	subjects, err := r.sbU.GetBySearchParameter(utils.ConvertNilToZeroValue(title), utils.ConvertNilToZeroValue(faculty), utils.ConvertNilToZeroValue(academicField))
+	subjects, err := r.sbU.GetBySearchParameter(title, faculty, academicField)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` func of SubjectUsecase: %w", err)
 	}
