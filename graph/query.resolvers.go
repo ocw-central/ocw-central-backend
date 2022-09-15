@@ -9,7 +9,6 @@ import (
 
 	"github.com/kafugen/ocwcentral/graph/generated"
 	"github.com/kafugen/ocwcentral/graph/model"
-	"github.com/kafugen/ocwcentral/utils"
 )
 
 // Subject is the resolver for the subject field.
