@@ -28,8 +28,7 @@ CREATE TABLE IF NOT EXISTS videos(
     video_length INT,
     language VARCHAR(100),
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
+    updated_at DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS syllabuses(
@@ -64,8 +63,7 @@ CREATE TABLE IF NOT EXISTS chapters(
     topic VARCHAR(500) NOT NULL,
     thumbnail_link VARCHAR(200) NOT NULL,
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE RESTRICT
+    updated_at DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS resources(
@@ -76,8 +74,7 @@ CREATE TABLE IF NOT EXISTS resources(
     ordering INT NOT NULL,
     link VARCHAR(200),
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
+    updated_at DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS subpages(
@@ -85,8 +82,7 @@ CREATE TABLE IF NOT EXISTS subpages(
     subject_id BINARY(16) NOT NULL,
     content MEDIUMTEXT,
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
+    updated_at DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS subject_related_subjects(
@@ -94,9 +90,7 @@ CREATE TABLE IF NOT EXISTS subject_related_subjects(
     related_subject_id BINARY(16) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    PRIMARY KEY (subject_id, related_subject_id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
-    FOREIGN KEY (related_subject_id) REFERENCES subjects(id) ON DELETE RESTRICT
+    PRIMARY KEY (subject_id, related_subject_id)
 );
 
 COMMIT;
