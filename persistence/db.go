@@ -11,7 +11,7 @@ import (
 
 func NewDB(env *env.EnvConfig) *sqlx.DB {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s)/%s?parseTime=true&loc=Local&tls=true",
+		"%s:%s@tcp(%s)/%s?parseTime=true&loc=Local",
 		env.MysqlUser,
 		env.MysqlPassowrd,
 		env.MysqlAddr,
