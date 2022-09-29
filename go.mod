@@ -9,6 +9,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/oklog/ulid v1.3.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/vektah/gqlparser/v2 v2.4.8
 )
 

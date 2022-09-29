@@ -59,6 +59,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		AcademicFields func(childComplexity int) int
+		RandomSubjects func(childComplexity int) int
 		Subject        func(childComplexity int, id string) int
 		Subjects       func(childComplexity int, title string, faculty string, academicField string) int
 	}
@@ -154,6 +155,7 @@ type QueryResolver interface {
 	Subject(ctx context.Context, id string) (*model.Subject, error)
 	Subjects(ctx context.Context, title string, faculty string, academicField string) ([]*model.Subject, error)
 	AcademicFields(ctx context.Context) ([]*model.AcademicField, error)
+	RandomSubjects(ctx context.Context) ([]*model.Subject, error)
 }
 type SubjectResolver interface {
 	Videos(ctx context.Context, obj *model.Subject) ([]*model.Video, error)
@@ -220,6 +222,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AcademicFields(childComplexity), true
+
+	case "Query.randomSubjects":
+		if e.complexity.Query.RandomSubjects == nil {
+			break
+		}
+
+		return e.complexity.Query.RandomSubjects(childComplexity), true
 
 	case "Query.subject":
 		if e.complexity.Query.Subject == nil {
@@ -794,6 +803,7 @@ var sources = []*ast.Source{
   subject(id: ID!): Subject!
   subjects(title: String!, faculty: String!, academicField: String!): [Subject!]!
   academicFields: [AcademicField!]!
+  randomSubjects: [Subject!]!
 }
 `, BuiltIn: false},
 	{Name: "../schemas/related_subject.graphqls", Input: `type RelatedSubject implements Node {
@@ -1434,6 +1444,84 @@ func (ec *executionContext) fieldContext_Query_academicFields(ctx context.Contex
 				return ec.fieldContext_AcademicField_name(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AcademicField", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_randomSubjects(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_randomSubjects(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().RandomSubjects(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Subject)
+	fc.Result = res
+	return ec.marshalNSubject2ᚕᚖgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐSubjectᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_randomSubjects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Subject_id(ctx, field)
+			case "category":
+				return ec.fieldContext_Subject_category(ctx, field)
+			case "title":
+				return ec.fieldContext_Subject_title(ctx, field)
+			case "videos":
+				return ec.fieldContext_Subject_videos(ctx, field)
+			case "location":
+				return ec.fieldContext_Subject_location(ctx, field)
+			case "resources":
+				return ec.fieldContext_Subject_resources(ctx, field)
+			case "relatedSubjects":
+				return ec.fieldContext_Subject_relatedSubjects(ctx, field)
+			case "department":
+				return ec.fieldContext_Subject_department(ctx, field)
+			case "firstHeldOn":
+				return ec.fieldContext_Subject_firstHeldOn(ctx, field)
+			case "faculty":
+				return ec.fieldContext_Subject_faculty(ctx, field)
+			case "language":
+				return ec.fieldContext_Subject_language(ctx, field)
+			case "freeDescription":
+				return ec.fieldContext_Subject_freeDescription(ctx, field)
+			case "syllabus":
+				return ec.fieldContext_Subject_syllabus(ctx, field)
+			case "series":
+				return ec.fieldContext_Subject_series(ctx, field)
+			case "academicField":
+				return ec.fieldContext_Subject_academicField(ctx, field)
+			case "thumbnailLink":
+				return ec.fieldContext_Subject_thumbnailLink(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Subject", field.Name)
 		},
 	}
 	return fc, nil
@@ -6669,6 +6757,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_academicFields(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "randomSubjects":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_randomSubjects(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
