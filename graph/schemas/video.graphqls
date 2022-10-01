@@ -8,4 +8,5 @@ type Video implements Node {
   lecturedOn: Time!
   videoLength: Int!
   language: String!
+  transcription: String!
 }

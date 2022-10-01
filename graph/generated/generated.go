@@ -139,15 +139,16 @@ type ComplexityRoot struct {
 	}
 
 	Video struct {
-		Chapters    func(childComplexity int) int
-		Faculty     func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Language    func(childComplexity int) int
-		LecturedOn  func(childComplexity int) int
-		Link        func(childComplexity int) int
-		Ordering    func(childComplexity int) int
-		Title       func(childComplexity int) int
-		VideoLength func(childComplexity int) int
+		Chapters      func(childComplexity int) int
+		Faculty       func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Language      func(childComplexity int) int
+		LecturedOn    func(childComplexity int) int
+		Link          func(childComplexity int) int
+		Ordering      func(childComplexity int) int
+		Title         func(childComplexity int) int
+		Transcription func(childComplexity int) int
+		VideoLength   func(childComplexity int) int
 	}
 }
 
@@ -723,6 +724,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Video.Title(childComplexity), true
 
+	case "Video.transcription":
+		if e.complexity.Video.Transcription == nil {
+			break
+		}
+
+		return e.complexity.Video.Transcription(childComplexity), true
+
 	case "Video.videoLength":
 		if e.complexity.Video.VideoLength == nil {
 			break
@@ -893,6 +901,7 @@ scalar Time
   lecturedOn: Time!
   videoLength: Int!
   language: String!
+  transcription: String!
 }
 `, BuiltIn: false},
 }
@@ -2769,6 +2778,8 @@ func (ec *executionContext) fieldContext_Subject_videos(ctx context.Context, fie
 				return ec.fieldContext_Video_videoLength(ctx, field)
 			case "language":
 				return ec.fieldContext_Video_language(ctx, field)
+			case "transcription":
+				return ec.fieldContext_Video_transcription(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Video", field.Name)
 		},
@@ -4754,6 +4765,50 @@ func (ec *executionContext) _Video_language(ctx context.Context, field graphql.C
 }
 
 func (ec *executionContext) fieldContext_Video_language(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Video",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Video_transcription(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Video_transcription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Transcription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Video_transcription(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Video",
 		Field:      field,
@@ -7449,6 +7504,13 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 		case "language":
 
 			out.Values[i] = ec._Video_language(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "transcription":
+
+			out.Values[i] = ec._Video_transcription(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
