@@ -31,3 +31,6 @@ func (v *Video) VideoLength() time.Duration {
 func (v *Video) Language() string {
 	return v.language
 }
+func (v *Video) Transcription() string {
+	return v.transcription
+}

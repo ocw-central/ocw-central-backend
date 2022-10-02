@@ -16,4 +16,5 @@ type VideoChapterDTO struct {
 	StartAt       *int       `db:"start_at"`
 	Topic         *string    `db:"topic"`
 	ThumbnailLink *string    `db:"thumbnail_link"`
+	Transcription *string    `db:"transcription"`
 }

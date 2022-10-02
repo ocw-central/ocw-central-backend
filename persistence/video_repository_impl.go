@@ -43,7 +43,8 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 			chapters.id AS chapter_id,
 			start_at,
 			topic,
-			thumbnail_link
+			thumbnail_link,
+			transcription
 		FROM videos
 		LEFT JOIN chapters
 		ON videos.id = chapters.video_id
@@ -80,11 +81,12 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 			utils.ConvertNilToZeroValue(videoChapterDTO.LecturedOn),
 			time.Duration(*videoChapterDTO.VideoLength*int(time.Second)),
 			utils.ConvertNilToZeroValue(videoChapterDTO.Language),
+			utils.ConvertNilToZeroValue(videoChapterDTO.Transcription),
 		)
 
 		if len(chapters) == 0 {
 			rowIndex++
-		} else{
+		} else {
 			rowIndex += len(chapters)
 		}
 	}

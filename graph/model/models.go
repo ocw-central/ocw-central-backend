@@ -59,15 +59,16 @@ func (this Syllabus) GetID() string { return this.ID }
 
 // type Video dto.VideoDTO
 type Video struct {
-	ID          string    `json:"id"`
-	Ordering    int       `json:"ordering"`
-	Title       string    `json:"title"`
-	Link        string    `json:"link"`
-	Chapters    []Chapter `json:"chapters"`
-	Faculty     string    `json:"faculty"`
-	LecturedOn  time.Time `json:"lecturedOn"`
-	VideoLength int       `json:"videoLength"`
-	Language    string    `json:"language"`
+	ID            string    `json:"id"`
+	Ordering      int       `json:"ordering"`
+	Title         string    `json:"title"`
+	Link          string    `json:"link"`
+	Chapters      []Chapter `json:"chapters"`
+	Faculty       string    `json:"faculty"`
+	LecturedOn    time.Time `json:"lecturedOn"`
+	VideoLength   int       `json:"videoLength"`
+	Language      string    `json:"language"`
+	Transcription string    `json:"transcription"`
 }
 
 func (Video) IsNode()            {}
