@@ -61,7 +61,7 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 	for ordering := 0; ordering < len(ids); ordering++ {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
 
-		chapters, err := getChaptersByOrdering(ordering, videoChapterDTOs[rowIndex:])
+		chapters, err := getChapters(videoChapterDTOs[rowIndex:])
 		if err != nil {
 			return nil, fmt.Errorf("failed to get chapters (rowIndex: %v, ordering: %v): %w", rowIndex, ordering, err)
 		}
@@ -93,13 +93,17 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 	return videos, nil
 }
 
-// getChaptersByOrdering returns chapters of the video with the given ordering.
-func getChaptersByOrdering(ordering int, videoChapterDTOs []dto.VideoChapterDTO) ([]model.Chapter, error) {
+// getChapters returns chapters of the video with the given ordering.
+// videoChapterDTOs need not be sorted by id or ordering,
+// but chapters of the same video must be contiguous.
+// The video containing the chapter to retrieve must come at the top of the array.
+func getChapters(videoChapterDTOs []dto.VideoChapterDTO) ([]model.Chapter, error) {
+	videoId := videoChapterDTOs[0].Id
 	rowIndex := 0
 
-	// the number of chapter is exptected to be smaller than 10.
+	// the number of chapter is expected to be smaller than 10.
 	chapters := make([]model.Chapter, 0, 10)
-	for rowIndex < len(videoChapterDTOs) && ordering == *videoChapterDTOs[rowIndex].Ordering {
+	for rowIndex < len(videoChapterDTOs) && bytes.Equal(*videoId, *videoChapterDTOs[rowIndex].Id) {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
 
 		if videoChapterDTO.ChapterId == nil {
