@@ -1,0 +1,5 @@
+BEGIN;
+
+ALTER TABLE videos ADD COLUMN transcription MEDIUMTEXT;
+
+COMMIT;

@@ -29,15 +29,16 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 			chapters[i] = model.Chapter(chapter)
 		}
 		videos[i] = &model.Video{
-			ID:          videoDTO.ID,
-			Title:       videoDTO.Title,
-			Ordering:    videoDTO.Ordering,
-			Link:        videoDTO.Link,
-			Chapters:    chapters,
-			Faculty:     videoDTO.Faculty,
-			LecturedOn:  videoDTO.LecturedOn,
-			VideoLength: videoDTO.VideoLength,
-			Language:    videoDTO.Language,
+			ID:            videoDTO.ID,
+			Title:         videoDTO.Title,
+			Ordering:      videoDTO.Ordering,
+			Link:          videoDTO.Link,
+			Chapters:      chapters,
+			Faculty:       videoDTO.Faculty,
+			LecturedOn:    videoDTO.LecturedOn,
+			VideoLength:   videoDTO.VideoLength,
+			Language:      videoDTO.Language,
+			Transcription: videoDTO.Transcription,
 		}
 	}
 	return videos, nil

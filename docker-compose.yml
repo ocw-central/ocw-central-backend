@@ -9,7 +9,7 @@ services:
       - db
       - migrate
     ports:
-      - ${SERVER_HOST_PORT}:8080
+      - 8080:8080
     volumes:
       - ./docker/server:/var/lib/server
     environment:
@@ -17,8 +17,8 @@ services:
       TZ: Asia/Tokyo
       PORT: 8080
       MYSQL_ADDR: db:3306
-      MYSQL_USER: ${MYSQL_CONTAINER_USER}
-      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ocw-central
       APP_ENV: ${APP_ENV}
   migrate:
@@ -33,8 +33,8 @@ services:
       MIGRATIONS_DIR: /migrations
       MYSQL_HOST: db
       MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_CONTAINER_USER}
-      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ocw-central
       ACCESS_USER: ${ACCESS_USER}
       ACCESS_TOKEN: ${ACCESS_TOKEN}
@@ -46,11 +46,11 @@ services:
       context: ./
       dockerfile: ./docker/mysql/Dockerfile
     ports:
-      - ${MYSQL_HOST_PORT}:3306
+      - 3306:3306
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
     environment:
-      MYSQL_USER: ${MYSQL_CONTAINER_USER}
-      MYSQL_PASSWORD: ${MYSQL_CONTAINER_PASSWORD}
-      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_CONTAINER_ALLOW_EMPTY_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
       MYSQL_DATABASE: ocw-central

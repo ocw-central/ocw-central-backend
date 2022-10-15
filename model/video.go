@@ -29,15 +29,16 @@ func (s VideoId) ByteSlice() []byte {
 }
 
 type Video struct {
-	id          VideoId       `desc:"ID"`
-	title       string        `desc:"タイトル"`
-	ordering    int           `desc:"順番"`
-	link        string        `desc:"リンク"`
-	chapters    []Chapter     `desc:"チャプターs"`
-	faculty     string        `desc:"教員の氏名と所属職位"`
-	lecturedOn  time.Time     `desc:"講義日"`
-	videoLength time.Duration `desc:"動画の長さ"`
-	language    string        `desc:"使用言語"`
+	id            VideoId       `desc:"ID"`
+	title         string        `desc:"タイトル"`
+	ordering      int           `desc:"順番"`
+	link          string        `desc:"リンク"`
+	chapters      []Chapter     `desc:"チャプターs"`
+	faculty       string        `desc:"教員の氏名と所属職位"`
+	lecturedOn    time.Time     `desc:"講義日"`
+	videoLength   time.Duration `desc:"動画の長さ"`
+	language      string        `desc:"使用言語"`
+	transcription string        `desc:"書き起こし"`
 }
 
 func NewVideoFromRepository(
@@ -50,16 +51,18 @@ func NewVideoFromRepository(
 	lecturedOn time.Time,
 	videoLength time.Duration,
 	language string,
+	transcription string,
 ) *Video {
 	return &Video{
-		id:          id,
-		title:       title,
-		ordering:    ordering,
-		link:        link,
-		chapters:    chapters,
-		faculty:     faculty,
-		lecturedOn:  lecturedOn,
-		videoLength: videoLength,
-		language:    language,
+		id:            id,
+		title:         title,
+		ordering:      ordering,
+		link:          link,
+		chapters:      chapters,
+		faculty:       faculty,
+		lecturedOn:    lecturedOn,
+		videoLength:   videoLength,
+		language:      language,
+		transcription: transcription,
 	}
 }

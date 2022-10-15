@@ -25,14 +25,16 @@ func main() {
 	resolver := InitializeResolver()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver}))
-
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.HandleFunc("/query", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.Header().Set("Access-Control-Allow-Origin", frontendOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		srv.ServeHTTP(w, r)
 	})
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", env.Port)
+	// Handle playground for DEV environment
+	if env.AppEnv == "DEV" {
+		http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
+		log.Printf("connect to http://localhost:%s/playground for GraphQL playground", env.Port)
+	}
 	log.Fatal(http.ListenAndServe(":"+env.Port, nil))
 }

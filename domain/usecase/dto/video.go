@@ -7,15 +7,16 @@ import (
 )
 
 type VideoDTO struct {
-	ID          string       `json:"id"`
-	Title       string       `json:"title"`
-	Ordering    int          `json:"ordering"`
-	Link        string       `json:"link"`
-	Chapters    []ChapterDTO `json:"chapters"`
-	Faculty     string       `json:"faculty"`
-	LecturedOn  time.Time    `json:"lecturedOn"`
-	VideoLength int          `json:"videoLength"`
-	Language    string       `json:"language"`
+	ID            string       `json:"id"`
+	Title         string       `json:"title"`
+	Ordering      int          `json:"ordering"`
+	Link          string       `json:"link"`
+	Chapters      []ChapterDTO `json:"chapters"`
+	Faculty       string       `json:"faculty"`
+	LecturedOn    time.Time    `json:"lecturedOn"`
+	VideoLength   int          `json:"videoLength"`
+	Language      string       `json:"language"`
+	Transcription string       `json:"transcription"`
 }
 
 func NewVideoDTO(video *model.Video) *VideoDTO {
@@ -25,14 +26,15 @@ func NewVideoDTO(video *model.Video) *VideoDTO {
 	}
 
 	return &VideoDTO{
-		ID:          video.Id().String(),
-		Title:       video.Title(),
-		Ordering:    video.Ordering(),
-		Link:        video.Link(),
-		Chapters:    chapterDTOs,
-		Faculty:     video.Faculty(),
-		LecturedOn:  video.LecturedOn(),
-		VideoLength: int(video.VideoLength().Seconds()),
-		Language:    video.Language(),
+		ID:            video.Id().String(),
+		Title:         video.Title(),
+		Ordering:      video.Ordering(),
+		Link:          video.Link(),
+		Chapters:      chapterDTOs,
+		Faculty:       video.Faculty(),
+		LecturedOn:    video.LecturedOn(),
+		VideoLength:   int(video.VideoLength().Seconds()),
+		Language:      video.Language(),
+		Transcription: video.Transcription(),
 	}
 }
