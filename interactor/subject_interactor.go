@@ -21,12 +21,14 @@ const (
 
 type SubjectInteractor struct {
 	sR                 repository.SubjectRepository
+	vR                 repository.VideoRepository
 	randomSubjectCache *cache.Cache
 }
 
-func NewSubjectInteractor(sR repository.SubjectRepository) *SubjectInteractor {
+func NewSubjectInteractor(sR repository.SubjectRepository, vR repository.VideoRepository) *SubjectInteractor {
 	return &SubjectInteractor{
 		sR:                 sR,
+		vR:                 vR,
 		randomSubjectCache: cache.New(cacheDefaultExpiration, cacheCleanupInterval),
 	}
 }
@@ -100,4 +102,37 @@ func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
 
 	sI.randomSubjectCache.Set("random-subjects", subjectDTOs, cache.DefaultExpiration)
 	return subjectDTOs, nil
+}
+
+func (sI SubjectInteractor) GetByVideoSearchParameter(title string, faculty string) ([]*dto.SubjectWithSpecifiedVideosDTO, error) {
+	videos, err := sI.vR.GetBySearchParameter(title, faculty)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` of VideoRepository: %w", err)
+	}
+
+	m := map[string]*model.Video{}
+	videoIds := make([]model.VideoId, len(videos))
+	for _, video := range videos {
+		m[video.Id().String()] = video
+		videoIds = append(videoIds, video.Id())
+	}
+
+	subjects, err := sI.sR.GetByVideoIds(videoIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByVideoIds` of SubjectRepository: %w", err)
+	}
+
+	subjectWithSpecifiedVideosDTOs := make([]*dto.SubjectWithSpecifiedVideosDTO, len(subjects))
+	for i, subject := range subjects {
+		videos := make([]*model.Video, 0, 20)
+		for _, videoId := range subject.VideoIds() {
+			_, ok := m[videoId.String()]
+			if ok {
+				videos = append(videos, m[videoId.String()])
+			}
+		}
+		subjectWithSpecifiedVideosDTOs[i] = dto.NewSubjectWithSpecifiedVideosDTO(subject, videos)
+	}
+
+	return subjectWithSpecifiedVideosDTOs, nil
 }

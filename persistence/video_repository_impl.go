@@ -145,3 +145,58 @@ func getChapters(videoChapterDTOs []dto.VideoChapterDTO) ([]model.Chapter, error
 	}
 	return chapters, nil
 }
+
+func (vR *VideoRepositoryImpl) GetBySearchParameter(title string, faculty string) ([]*model.Video, error) {
+	if title == "" && faculty == "" {
+		return nil, nil
+	}
+
+	videoSQL := `
+		SELECT
+			videos.id,
+			subject_id,
+			title,
+			faculty,
+			ordering,
+			link,
+			lectured_on,
+			video_length,
+			language,
+			chapters.id AS chapter_id,
+			start_at,
+			topic,
+			thumbnail_link,
+			transcription
+		FROM videos
+		LEFT JOIN chapters
+		ON videos.id = chapters.video_id
+	`
+
+	parameters := map[string]interface{}{"title": "%" + title + "%", "faculty": "%" + faculty + "%"}
+	if title != "" && faculty != "" {
+		videoSQL += "WHERE title LIKE ? AND faculty LIKE ?\n"
+	} else if title != "" {
+		videoSQL += "WHERE title LIKE :title\n"
+		delete(parameters, "faculty")
+	} else if faculty != "" {
+		videoSQL += "WHERE faculty LIKE :faculty\n"
+		delete(parameters, "title")
+	}
+	videoSQL += "ORDER BY videos.id, chapters.start_at"
+
+	stmt, err := vR.db.PrepareNamed(videoSQL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare statement: %w", err)
+	}
+
+	var videoChapterDTOs []dto.VideoChapterDTO
+	if err := stmt.Select(&videoChapterDTOs, parameters); err != nil {
+		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
+	}
+
+	videos, err := getVideosFromDTOs(videoChapterDTOs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get videos from DTOs: %w", err)
+	}
+	return videos, nil
+}

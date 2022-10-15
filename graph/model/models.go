@@ -96,3 +96,19 @@ type RelatedSubject dto.SubjectDTO
 
 func (RelatedSubject) IsNode()            {}
 func (this RelatedSubject) GetID() string { return this.ID }
+
+type SubjectWithSpecifiedVideos struct {
+	Subject Subject
+	Videos  []Video
+}
+
+func NewSubjectWithSpecifiedVideos(sv *dto.SubjectWithSpecifiedVideosDTO) *SubjectWithSpecifiedVideos {
+	videos := make([]Video, len(sv.Videos))
+	for i, video := range sv.Videos {
+		videos[i] = *NewVideo(&video)
+	}
+	return &SubjectWithSpecifiedVideos{
+		Subject: Subject(sv.Subject),
+		Videos:  videos,
+	}
+}

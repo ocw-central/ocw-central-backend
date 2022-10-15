@@ -6,4 +6,5 @@ import (
 
 type VideoRepository interface {
 	GetByIds(ids []model.VideoId) ([]*model.Video, error)
+	GetBySearchParameter(title string, faculty string) ([]*model.Video, error)
 }

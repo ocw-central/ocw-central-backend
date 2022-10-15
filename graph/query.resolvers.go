@@ -68,6 +68,22 @@ func (r *queryResolver) RandomSubjects(ctx context.Context) ([]*model.Subject, e
 	return ss, nil
 }
 
+// SubjectsWithSpecifiedVideos is the resolver for the subjectsWithSpecifiedVideos field.
+func (r *queryResolver) SubjectsWithSpecifiedVideos(ctx context.Context, title string, faculty string) ([]*model.SubjectWithSpecifiedVideos, error) {
+	if title == "" && faculty == "" {
+		return nil, fmt.Errorf("at least one of the parameters must be specified")
+	}
+	subjectWithSpecifiedVideoDTOs, err := r.sbU.GetByVideoSearchParameter(title, faculty)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByVideoSearchParameter` func of SubjectUsecase: %w", err)
+	}
+	svs := make([]*model.SubjectWithSpecifiedVideos, len(subjectWithSpecifiedVideoDTOs))
+	for i, sv := range subjectWithSpecifiedVideoDTOs {
+		svs[i] = model.NewSubjectWithSpecifiedVideos(sv)
+	}
+	return svs, nil
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 

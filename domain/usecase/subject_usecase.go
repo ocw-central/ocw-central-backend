@@ -9,4 +9,5 @@ type SubjectUsecase interface {
 	GetByIds(ids []string) ([]*dto.SubjectDTO, error)
 	GetBySearchParameter(title string, faculty string, academicField string) ([]*dto.SubjectDTO, error)
 	GetByRandom() ([]*dto.SubjectDTO, error)
+	GetByVideoSearchParameter(title string, faculty string) ([]*dto.SubjectWithSpecifiedVideosDTO, error)
 }
