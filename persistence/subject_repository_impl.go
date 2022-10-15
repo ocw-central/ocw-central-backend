@@ -273,6 +273,10 @@ func (sR SubjectRepositoryImpl) GetByRandom(numSubjects int) ([]*model.Subject, 
 }
 
 func (sR SubjectRepositoryImpl) GetByVideoIds(videoIds []model.VideoId) ([]*model.Subject, error) {
+	if len(videoIds) == 0 {
+		return nil, nil
+	}
+
 	videoIdBytes := make([]interface{}, len(videoIds))
 	for i, videoId := range videoIds {
 		videoIdBytes[i] = videoId.ByteSlice()

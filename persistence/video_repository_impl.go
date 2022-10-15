@@ -173,7 +173,7 @@ func (vR *VideoRepositoryImpl) GetBySearchParameter(title string, faculty string
 
 	parameters := map[string]interface{}{"title": "%" + title + "%", "faculty": "%" + faculty + "%"}
 	if title != "" && faculty != "" {
-		videoSQL += "WHERE title LIKE ? AND faculty LIKE ?\n"
+		videoSQL += "WHERE title LIKE :title AND faculty LIKE :faculty\n"
 	} else if title != "" {
 		videoSQL += "WHERE title LIKE :title\n"
 		delete(parameters, "faculty")
