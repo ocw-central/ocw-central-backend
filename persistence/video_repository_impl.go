@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	"bytes"
 	"fmt"
 	"time"
 
@@ -58,14 +59,28 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
 	}
 
+	videos, err := getVideosFromDTOs(videoChapterDTOs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get videos from DTOs: %w", err)
+	}
+	return videos, nil
+}
+
+// getVideosFromDTOs returns videos from the given videoChapterDTOs.
+// videoChapterDTOs need not be sorted by id or ordering,
+// but chapters of the same video must be contiguous.
+func getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, error) {
 	rowIndex := 0
-	videos := make([]*model.Video, len(ids))
-	for ordering := 0; ordering < len(ids); ordering++ {
+
+	// the number of video is expected to be smaller than 20,
+	// because this function is expected to be called with videos of one subject.
+	videos := make([]*model.Video, 0, 20)
+	for rowIndex < len(videoChapterDTOs) {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
 
 		chapters, err := getChapters(videoChapterDTOs[rowIndex:])
 		if err != nil {
-			return nil, fmt.Errorf("failed to get chapters (rowIndex: %v, ordering: %v): %w", rowIndex, ordering, err)
+			return nil, fmt.Errorf("failed to get chapters (rowIndex: %v): %w", rowIndex, err)
 		}
 
 		videoId, err := model.NewVideoId(*videoChapterDTO.Id)
@@ -73,7 +88,8 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 			return nil, fmt.Errorf("failed to create `videoId`: %w", err)
 		}
 
-		videos[ordering] = model.NewVideoFromRepository(
+
+		video := model.NewVideoFromRepository(
 			*videoId,
 			*videoChapterDTO.Title,
 			*videoChapterDTO.Ordering,
@@ -85,6 +101,7 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 			utils.ConvertNilToZeroValue(videoChapterDTO.Language),
 			utils.ConvertNilToZeroValue(videoChapterDTO.Transcription),
 		)
+		videos = append(videos, video)
 
 		if len(chapters) == 0 {
 			rowIndex++
