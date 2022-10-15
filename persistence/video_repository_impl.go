@@ -88,7 +88,6 @@ func getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, 
 			return nil, fmt.Errorf("failed to create `videoId`: %w", err)
 		}
 
-
 		video := model.NewVideoFromRepository(
 			*videoId,
 			*videoChapterDTO.Title,
