@@ -1,4 +1,5 @@
-![android-chrome-192x192](https://user-images.githubusercontent.com/44559556/196192159-7684237a-ba00-4ea4-8c37-3395acb19492.png)
+<img align="left" src=https://user-images.githubusercontent.com/44559556/196192159-7684237a-ba00-4ea4-8c37-3395acb19492.png width="100" height="100">
+
 # ocwcentral
 
 [![Badge Status](https://github.com/kafugen/ocwcentral/workflows/golangci-lint/badge.svg)](https://github.com/kafugen/ocwcentral/actinos)
