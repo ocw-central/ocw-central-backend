@@ -23,7 +23,7 @@
     ```
     docker-compose up --build
     ```
-3. You need to import data into the database for the first time. **The mock data will be available soon.** You can do it by running the following command.
+3. You need to import data into the database for the first time. (**The mock data will be available soon.**) You can do it by running the following command.
     ```
     mysql ocw-central < /path/to/dump/file.sql -p　<MYSQL_PASSWORD>
     ```
