@@ -2,7 +2,7 @@
 
 # ocwcentral
 
-[![Badge Status](https://github.com/ocw-central/ocw-central-backend/workflows/golangci-lint/badge.svg)](https://github.com/ocw-central/ocw-central-backend/actinos)
+[![golangci-lint](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
 
 ## How to start this app
