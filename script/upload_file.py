@@ -1,17 +1,14 @@
-import requests
 import tempfile
+from typing import List
 
-import google.auth
-from googleapiclient.discovery import build
+import requests
+
 from googleapiclient.http import MediaFileUpload
 
-
-def get_service():
-    credentials, _ = google.auth.default()
-    return build('drive', 'v3', credentials=credentials)
+from service import get_service
 
 
-def upload_file_from_link(link: str, file_name: str) -> str:
+def upload_file_from_links(links: List[str], file_name: str) -> str:
     response = requests.get(link)
     fp = tempfile.NamedTemporaryFile()
     fp.write(response.content)
