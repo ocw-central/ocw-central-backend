@@ -14,7 +14,7 @@ func main() {
 	env := env.NewEnvConfig()
 
 	var frontendOrigin string
-	if env.AppEnv == "DEV" {
+	if env.AppEnv == "LOCAL" {
 		frontendOrigin = "http://127.0.0.1:5173"
 	} else if env.AppEnv == "PROD" {
 		frontendOrigin = "https://ocwcentral.com"
