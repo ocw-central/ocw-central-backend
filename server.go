@@ -43,8 +43,8 @@ func main() {
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		srv.ServeHTTP(w, r)
 	})
-	// Handle playground for DEV environment
-	if env.AppEnv == "DEV" {
+	// Handle playground for LOCAL environment
+	if env.AppEnv == "LOCAL" {
 		http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 		log.Printf("connect to http://localhost:%s/playground for GraphQL playground", env.Port)
 	}
