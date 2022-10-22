@@ -17,7 +17,7 @@ func main() {
 	var isOriginAllowed func(origin string) bool
 	if env.AppEnv == "LOCAL" {
 		isOriginAllowed = func(origin string) bool {
-			return origin == "http://127.0.0.1:5173"
+			return origin == "http://127.0.0.1:5173" || origin == "http://localhost:5173"
 		}
 	} else if env.AppEnv == "DEV" {
 		// The origin of the frontend app in dev environment
