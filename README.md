@@ -2,7 +2,7 @@
 
 # ocwcentral
 
-[![Badge Status](https://github.com/ocw-central/ocw-central-backend/workflows/golangci-lint/badge.svg)](https://github.com/ocw-central/ocw-central-backend/actinos)
+[![golangci-lint](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
 
 ## How to start this app
@@ -10,14 +10,14 @@
 1. Set up your environmental variables by changing file name from `.env.tmplate` to `.env` and specify the following variables.
 
    ```
-   APP_ENV=DEV
+   APP_ENV=LOCAL
 
    MYSQL_USER=
    MYSQL_PASSWORD=
    MYSQL_ALLOW_EMPTY_PASSWORD=false
    ```
 
-   - `APP_ENV` controls where this app is executed. Available variables are `DEV` for developing environment and `PROD` for production environment.
+   - `APP_ENV` controls where this app is executed. Available variables are `LOCAL` for local environment, `DEV` for developing environment (dev-api-ocwcentral.onrender.com), and `PROD` for production environment (api-ocwcentral.onrender.com).
    - `MYSQL_*` are settings for a local mysql container. You can specify any value you want.
 
 2. Start the container of this app.
