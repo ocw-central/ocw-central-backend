@@ -55,5 +55,9 @@ func main() {
 		http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 		log.Printf("connect to http://localhost:%s/playground for GraphQL playground", env.Port)
 	}
+	// health check
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 	log.Fatal(http.ListenAndServe(":"+env.Port, nil))
 }
