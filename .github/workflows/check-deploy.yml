@@ -20,7 +20,7 @@ jobs:
       - name: Check the deployed service URL
         uses: jtalk/url-health-check-action@v2
         with:
-          url: https://${{ secrets.RENDER_SERVER_DOMAIN }}-pr-${{ env.PR_NUM }}.onrender.com/query.
+          url: https://${{ secrets.RENDER_SERVER_DOMAIN }}-pr-${{ env.PR_NUM }}.onrender.com/health
           max-attempts: 20
           retry-delay: 20s
     # 現時点ではrenderの標準機能で自動デプロイを行う

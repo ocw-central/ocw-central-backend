@@ -105,7 +105,7 @@ func (sR *SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syl
 
 		if len(subpages) == 0 {
 			rowIndex++
-		} else{
+		} else {
 			rowIndex += len(subpages)
 		}
 	}
