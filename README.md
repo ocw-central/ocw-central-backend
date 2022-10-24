@@ -24,7 +24,7 @@
     ```
     docker-compose up --build
     ```
-3. You need to import data into the database at the first time. The mock data is available [here](https://drive.google.com/file/d/1dIvY5CSnryzk_WcUtHWlQihC_h28C-HP/view?usp=drivesdk). You can do it by running the following command.
+3. You need to import data into the database at the first time. The mock data is available [here](https://drive.google.com/file/d/1dIvY5CSnryzk_WcUtHWlQihC_h28C-HP/view?usp=drivesdk). You can import it by running the following command.
     ```
     mysql -p　<MYSQL_PASSWORD> ocw-central < /path/to/dump/file.sql
     ```
