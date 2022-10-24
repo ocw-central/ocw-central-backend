@@ -1,3 +1,5 @@
+import json
+import logging
 from typing import List
 
 from service import get_service
@@ -18,11 +20,19 @@ def get_file_ids() -> List[str]:
             ) \
             .execute()
 
-        assert PAGE_SIZE == len(results["files"])
+        logging.info(f"Fetched {len(results['files'])} files.")
         file_ids.extend([file["id"] for file in results["files"]])
 
         page_token = results.get("nextPageToken", None)
         if page_token is None:
             break
 
+    logging.info(f"Finished fetching. Fetched {len(file_ids)} files.")
     return file_ids
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    ids = get_file_ids()
+    with open("uploaded_file_ids.json", "w") as f:
+        json.dump(ids, f)
