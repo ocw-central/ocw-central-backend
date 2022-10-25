@@ -271,3 +271,52 @@ func (sR SubjectRepositoryImpl) GetByRandom(numSubjects int) ([]*model.Subject, 
 	}
 	return subjects, nil
 }
+
+func (sR SubjectRepositoryImpl) GetByVideoIds(videoIds []model.VideoId) ([]*model.Subject, error) {
+	if len(videoIds) == 0 {
+		return nil, nil
+	}
+
+	videoIdBytes := make([]interface{}, len(videoIds))
+	for i, videoId := range videoIds {
+		videoIdBytes[i] = videoId.ByteSlice()
+	}
+	sql := `
+		SELECT
+			subjects.id,
+			category,
+			title,
+			location,
+			department,
+			first_held_on,
+			subjects.faculty,
+			subjects.language,
+			free_description,
+			series,
+			academic_field,
+			syllabuses.id AS syllabus_id,
+			thumbnail_link
+		FROM subjects
+		LEFT JOIN syllabuses
+		ON subjects.id = syllabuses.subject_id
+		WHERE subjects.id IN (
+			SELECT DISTINCT subject_id
+			FROM videos
+			WHERE id IN (` + utils.GetQuestionMarkStrs(len(videoIds)) + `)
+		)
+	`
+	subjectDTOs := []dto.SubjectDTO{}
+	if err := sR.db.Select(&subjectDTOs, sql, videoIdBytes...); err != nil {
+		return nil, fmt.Errorf("failed to select `subjects` table : %w", err)
+	}
+
+	subjects := make([]*model.Subject, len(subjectDTOs))
+	for i, subjectDTO := range subjectDTOs {
+		subject, err := sR.getSubjectFromDto(subjectDTO)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert `subjectDTO` to `subject`: %w", err)
+		}
+		subjects[i] = subject
+	}
+	return subjects, nil
+}

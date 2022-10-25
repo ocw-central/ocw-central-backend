@@ -24,22 +24,7 @@ func (r *subjectResolver) Videos(ctx context.Context, obj *model.Subject) ([]*mo
 
 	videos := make([]*model.Video, len(videoDTOs))
 	for i, videoDTO := range videoDTOs {
-		chapters := make([]model.Chapter, len(videoDTO.Chapters))
-		for i, chapter := range videoDTO.Chapters {
-			chapters[i] = model.Chapter(chapter)
-		}
-		videos[i] = &model.Video{
-			ID:            videoDTO.ID,
-			Title:         videoDTO.Title,
-			Ordering:      videoDTO.Ordering,
-			Link:          videoDTO.Link,
-			Chapters:      chapters,
-			Faculty:       videoDTO.Faculty,
-			LecturedOn:    videoDTO.LecturedOn,
-			VideoLength:   videoDTO.VideoLength,
-			Language:      videoDTO.Language,
-			Transcription: videoDTO.Transcription,
-		}
+		videos[i] = model.NewVideo(videoDTO)
 	}
 	return videos, nil
 }

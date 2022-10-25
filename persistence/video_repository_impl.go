@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	"bytes"
 	"fmt"
 	"time"
 
@@ -19,6 +20,8 @@ func NewVideoRepositoryImpl(db *sqlx.DB) *VideoRepositoryImpl {
 	return &VideoRepositoryImpl{db}
 }
 
+// GetByIds returns videos with the given ids.
+// This function is expected to get videos of one subject.
 func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, error) {
 	if len(ids) == 0 {
 		return nil, nil
@@ -56,14 +59,28 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
 	}
 
+	videos, err := getVideosFromDTOs(videoChapterDTOs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get videos from DTOs: %w", err)
+	}
+	return videos, nil
+}
+
+// getVideosFromDTOs returns videos from the given videoChapterDTOs.
+// videoChapterDTOs need not be sorted by id or ordering,
+// but chapters of the same video must be contiguous.
+func getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, error) {
 	rowIndex := 0
-	videos := make([]*model.Video, len(ids))
-	for ordering := 0; ordering < len(ids); ordering++ {
+
+	// the number of video is expected to be smaller than 20,
+	// because this function is expected to be called with videos of one subject.
+	videos := make([]*model.Video, 0, 20)
+	for rowIndex < len(videoChapterDTOs) {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
 
-		chapters, err := getChaptersByOrdering(ordering, videoChapterDTOs[rowIndex:])
+		chapters, err := getChapters(videoChapterDTOs[rowIndex:])
 		if err != nil {
-			return nil, fmt.Errorf("failed to get chapters (rowIndex: %v, ordering: %v): %w", rowIndex, ordering, err)
+			return nil, fmt.Errorf("failed to get chapters (rowIndex: %v): %w", rowIndex, err)
 		}
 
 		videoId, err := model.NewVideoId(*videoChapterDTO.Id)
@@ -71,7 +88,7 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 			return nil, fmt.Errorf("failed to create `videoId`: %w", err)
 		}
 
-		videos[ordering] = model.NewVideoFromRepository(
+		video := model.NewVideoFromRepository(
 			*videoId,
 			*videoChapterDTO.Title,
 			*videoChapterDTO.Ordering,
@@ -83,6 +100,7 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 			utils.ConvertNilToZeroValue(videoChapterDTO.Language),
 			utils.ConvertNilToZeroValue(videoChapterDTO.Transcription),
 		)
+		videos = append(videos, video)
 
 		if len(chapters) == 0 {
 			rowIndex++
@@ -93,13 +111,17 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 	return videos, nil
 }
 
-// getChaptersByOrdering returns chapters of the video with the given ordering.
-func getChaptersByOrdering(ordering int, videoChapterDTOs []dto.VideoChapterDTO) ([]model.Chapter, error) {
+// getChapters returns chapters of the video with the given ordering.
+// videoChapterDTOs need not be sorted by id or ordering,
+// but chapters of the same video must be contiguous.
+// The video containing the chapter to retrieve must come at the top of the array.
+func getChapters(videoChapterDTOs []dto.VideoChapterDTO) ([]model.Chapter, error) {
+	videoId := videoChapterDTOs[0].Id
 	rowIndex := 0
 
-	// the number of chapter is exptected to be smaller than 10.
+	// the number of chapter is expected to be smaller than 10.
 	chapters := make([]model.Chapter, 0, 10)
-	for rowIndex < len(videoChapterDTOs) && ordering == *videoChapterDTOs[rowIndex].Ordering {
+	for rowIndex < len(videoChapterDTOs) && bytes.Equal(*videoId, *videoChapterDTOs[rowIndex].Id) {
 		videoChapterDTO := videoChapterDTOs[rowIndex]
 
 		if videoChapterDTO.ChapterId == nil {
@@ -121,4 +143,59 @@ func getChaptersByOrdering(ordering int, videoChapterDTOs []dto.VideoChapterDTO)
 		rowIndex++
 	}
 	return chapters, nil
+}
+
+func (vR *VideoRepositoryImpl) GetBySearchParameter(title string, faculty string) ([]*model.Video, error) {
+	if title == "" && faculty == "" {
+		return nil, nil
+	}
+
+	videoSQL := `
+		SELECT
+			videos.id,
+			subject_id,
+			title,
+			faculty,
+			ordering,
+			link,
+			lectured_on,
+			video_length,
+			language,
+			chapters.id AS chapter_id,
+			start_at,
+			topic,
+			thumbnail_link,
+			transcription
+		FROM videos
+		LEFT JOIN chapters
+		ON videos.id = chapters.video_id
+	`
+
+	parameters := map[string]interface{}{"title": "%" + title + "%", "faculty": "%" + faculty + "%"}
+	if title != "" && faculty != "" {
+		videoSQL += "WHERE title LIKE :title AND faculty LIKE :faculty\n"
+	} else if title != "" {
+		videoSQL += "WHERE title LIKE :title\n"
+		delete(parameters, "faculty")
+	} else if faculty != "" {
+		videoSQL += "WHERE faculty LIKE :faculty\n"
+		delete(parameters, "title")
+	}
+	videoSQL += "ORDER BY videos.id, chapters.start_at"
+
+	stmt, err := vR.db.PrepareNamed(videoSQL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare statement: %w", err)
+	}
+
+	var videoChapterDTOs []dto.VideoChapterDTO
+	if err := stmt.Select(&videoChapterDTOs, parameters); err != nil {
+		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
+	}
+
+	videos, err := getVideosFromDTOs(videoChapterDTOs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get videos from DTOs: %w", err)
+	}
+	return videos, nil
 }
