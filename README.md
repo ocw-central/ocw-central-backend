@@ -24,9 +24,9 @@
     ```
     docker-compose up --build
     ```
-3. You need to import data into the database at the first time. The mock data is available [here](https://drive.google.com/file/d/1dIvY5CSnryzk_WcUtHWlQihC_h28C-HP/view?usp=drivesdk). You can import it by running the following command.
+3. You need to import data into the database at the first time. The mock data is available [here](./mock_data.md). You can import it by running the following command.
     ```
-    mysql -p　<MYSQL_PASSWORD> ocw-central < /path/to/dump/file.sql
+    mysql -p　<MYSQL_PASSWORD> -h 127.0.0.1 ocw-central < /path/to/dump/file.sql
     ```
 4. Access to [localhost:8080](localhost:8080) and you can see the app.
 
