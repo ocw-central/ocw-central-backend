@@ -4,7 +4,7 @@ You can download the mock data from [here](https://drive.google.com/file/d/1dIvY
 
 This data contains ten subjects and data related to the subjects.
 
-The following table shows the copyright of each subject.
+The following table shows the copyright of each subject. The data is fetched from [Kyoto University OCW](https://ocw.kyoto-u.ac.jp/en/), licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en).
 
 | Subject | Copyright |
 | --- | --- |
