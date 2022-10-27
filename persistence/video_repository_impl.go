@@ -27,7 +27,7 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 		return nil, nil
 	}
 
-	videoIdBytes := make([]interface{}, len(ids))
+	videoIdBytes := make([][]byte, len(ids))
 	for i, id := range ids {
 		videoIdBytes[i] = id.ByteSlice()
 	}
@@ -51,11 +51,16 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 		FROM videos
 		LEFT JOIN chapters
 		ON videos.id = chapters.video_id
-		WHERE videos.id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
+		WHERE videos.id IN (?)
 		ORDER BY videos.ordering, chapters.start_at
 	`
+	query, args, err := sqlx.In(videoSQL, videoIdBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed on expand `In` statement: %w", err)
+	}
+
 	var videoChapterDTOs []dto.VideoChapterDTO
-	if err := vR.db.Select(&videoChapterDTOs, videoSQL, videoIdBytes...); err != nil {
+	if err := vR.db.Select(&videoChapterDTOs, query, args...); err != nil {
 		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
 	}
 
