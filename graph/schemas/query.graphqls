@@ -3,4 +3,5 @@ type Query {
   subjects(title: String!, faculty: String!, academicField: String!): [Subject!]!
   academicFields: [AcademicField!]!
   randomSubjects: [Subject!]!
+  subjectsWithSpecifiedVideos(title: String!, faculty: String!): [SubjectWithSpecifiedVideos!]!
 }

@@ -74,7 +74,42 @@ type Video struct {
 func (Video) IsNode()            {}
 func (this Video) GetID() string { return this.ID }
 
+func NewVideo(videoDTO *dto.VideoDTO) *Video {
+	chapters := make([]Chapter, len(videoDTO.Chapters))
+	for i, chapter := range videoDTO.Chapters {
+		chapters[i] = Chapter(chapter)
+	}
+	return &Video{
+		ID:            videoDTO.ID,
+		Ordering:      videoDTO.Ordering,
+		Title:         videoDTO.Title,
+		Link:          videoDTO.Link,
+		Chapters:      chapters,
+		Faculty:       videoDTO.Faculty,
+		LecturedOn:    videoDTO.LecturedOn,
+		VideoLength:   videoDTO.VideoLength,
+		Language:      videoDTO.Language,
+		Transcription: videoDTO.Transcription,
+	}
+}
+
 type RelatedSubject dto.SubjectDTO
 
 func (RelatedSubject) IsNode()            {}
 func (this RelatedSubject) GetID() string { return this.ID }
+
+type SubjectWithSpecifiedVideos struct {
+	Subject Subject
+	Videos  []Video
+}
+
+func NewSubjectWithSpecifiedVideos(sv *dto.SubjectWithSpecifiedVideosDTO) *SubjectWithSpecifiedVideos {
+	videos := make([]Video, len(sv.Videos))
+	for i, video := range sv.Videos {
+		videos[i] = *NewVideo(&video)
+	}
+	return &SubjectWithSpecifiedVideos{
+		Subject: Subject(sv.Subject),
+		Videos:  videos,
+	}
+}

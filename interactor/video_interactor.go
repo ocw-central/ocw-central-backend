@@ -16,6 +16,8 @@ func NewVideoInteractor(sR repository.VideoRepository) *VideoInteractor {
 	return &VideoInteractor{sR}
 }
 
+// GetByIds returns a slice of `dto.VideoDTO` by specified `videoIds`.
+// This function requires `ids` only contains `videoIds` of one subject.
 func (sI *VideoInteractor) GetByIds(ids []string) ([]*dto.VideoDTO, error) {
 	if len(ids) == 0 {
 		return nil, nil
