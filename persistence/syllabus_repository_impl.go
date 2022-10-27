@@ -24,7 +24,7 @@ func (sR *SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syl
 		return nil, nil
 	}
 
-	syllabusIdBytes := make([]interface{}, len(ids))
+	syllabusIdBytes := make([][]byte, len(ids))
 	for i, id := range ids {
 		syllabusIdBytes[i] = id.ByteSlice()
 	}
@@ -55,12 +55,16 @@ func (sR *SyllabusRepositoryImpl) GetByIds(ids []model.SyllabusId) ([]*model.Syl
 		FROM syllabuses
 		LEFT JOIN subpages
 		ON syllabuses.subject_id = subpages.subject_id
-		WHERE syllabuses.id in (` + utils.GetQuestionMarkStrs(len(ids)) + `)
+		WHERE syllabuses.id in (?)
 		ORDER BY syllabuses.id, subpages.id
 	`
+	query, args, err := sqlx.In(syllabusSQL, syllabusIdBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed on expand `In` statement: %w", err)
+	}
 
 	var syllabusSubpageDTOs []dto.SyllabusSubpageDTO
-	if err := sR.db.Select(&syllabusSubpageDTOs, syllabusSQL, syllabusIdBytes...); err != nil {
+	if err := sR.db.Select(&syllabusSubpageDTOs, query, args...); err != nil {
 		return nil, fmt.Errorf("failed on select to `syllabuses` table: %w", err)
 	}
 

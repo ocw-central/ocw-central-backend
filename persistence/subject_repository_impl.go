@@ -277,7 +277,7 @@ func (sR SubjectRepositoryImpl) GetByVideoIds(videoIds []model.VideoId) ([]*mode
 		return nil, nil
 	}
 
-	videoIdBytes := make([]interface{}, len(videoIds))
+	videoIdBytes := make([][]byte, len(videoIds))
 	for i, videoId := range videoIds {
 		videoIdBytes[i] = videoId.ByteSlice()
 	}
@@ -302,11 +302,16 @@ func (sR SubjectRepositoryImpl) GetByVideoIds(videoIds []model.VideoId) ([]*mode
 		WHERE subjects.id IN (
 			SELECT DISTINCT subject_id
 			FROM videos
-			WHERE id IN (` + utils.GetQuestionMarkStrs(len(videoIds)) + `)
+			WHERE id IN (?)
 		)
 	`
+	query, args, err := sqlx.In(sql, videoIdBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed on expand `In` statement: %w", err)
+	}
+
 	subjectDTOs := []dto.SubjectDTO{}
-	if err := sR.db.Select(&subjectDTOs, sql, videoIdBytes...); err != nil {
+	if err := sR.db.Select(&subjectDTOs, query, args...); err != nil {
 		return nil, fmt.Errorf("failed to select `subjects` table : %w", err)
 	}
 

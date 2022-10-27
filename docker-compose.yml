@@ -36,8 +36,6 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ocw-central
-      ACCESS_USER: ${ACCESS_USER}
-      ACCESS_TOKEN: ${ACCESS_TOKEN}
       APP_ENV: ${APP_ENV}
     volumes:
       - ./migrations:/migrations
