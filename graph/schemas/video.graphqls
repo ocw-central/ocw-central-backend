@@ -5,7 +5,7 @@ type Video implements Node {
   link: String!
   chapters: [Chapter!]!
   faculty: String!
-  lecturedOn: Time!
+  lecturedOn: Time
   videoLength: Int!
   language: String!
   transcription: String!
