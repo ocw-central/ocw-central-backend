@@ -857,7 +857,7 @@ var sources = []*ast.Source{
   resourceIds: [ID!]!
   relatedSubjectIds: [ID!]!
   department: String!
-  firstHeldOn: Time!
+  firstHeldOn: Time
   faculty: String!
   language: String!
   freeDescription: String!
@@ -937,7 +937,7 @@ scalar Time
   link: String!
   chapters: [Chapter!]!
   faculty: String!
-  lecturedOn: Time!
+  lecturedOn: Time
   videoLength: Int!
   language: String!
   transcription: String!
@@ -2162,14 +2162,11 @@ func (ec *executionContext) _RelatedSubject_firstHeldOn(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_RelatedSubject_firstHeldOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4934,14 +4931,11 @@ func (ec *executionContext) _Video_lecturedOn(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Video_lecturedOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7232,9 +7226,6 @@ func (ec *executionContext) _RelatedSubject(ctx context.Context, sel ast.Selecti
 
 			out.Values[i] = ec._RelatedSubject_firstHeldOn(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "faculty":
 
 			out.Values[i] = ec._RelatedSubject_faculty(ctx, field, obj)
@@ -7817,9 +7808,6 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Values[i] = ec._Video_lecturedOn(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "videoLength":
 
 			out.Values[i] = ec._Video_videoLength(ctx, field, obj)
