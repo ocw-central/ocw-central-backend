@@ -258,7 +258,6 @@ func (sR SubjectRepositoryImpl) GetByRandom(series string, academicField string,
 		ON subjects.id = syllabuses.subject_id
 		RIGHT JOIN videos
 		ON subjects.id = videos.subject_id
-		GROUP BY subjects.id
 	`
 
 	searchQuery := ""
@@ -273,24 +272,29 @@ func (sR SubjectRepositoryImpl) GetByRandom(series string, academicField string,
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "academic_field = " + ":academic_field"
-		parameters["academic_field"] = academicField
+		searchQuery += "academic_field = " + ":academicField"
+		parameters["academicField"] = academicField
 	}
-
-	if searchQuery != "" {
-		searchQuery += " AND "
-	}
-	searchQuery += "ORDER BY RAND() LIMIT " + ":num_subjects"
-	parameters["num_subjects"] = numSubjects
 
 	if searchQuery != "" {
 		searchQuery = "WHERE " + searchQuery
 	}
+
+	searchQuery += " GROUP BY subjects.id "
+	searchQuery += "ORDER BY RAND() LIMIT " + ":numSubjects"
+	parameters["numSubjects"] = numSubjects
+
 	sql += searchQuery
+	// print
+	fmt.Println(sql)
+	stml, err := sR.db.PrepareNamed(sql)
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare sql: %w", err)
+	}
 
 	subjectDTOs := []dto.SubjectDTO{}
-	if err := sR.db.Select(&subjectDTOs, sql, parameters); err != nil {
-		return nil, fmt.Errorf("failed to select `subjects` table : %w", err)
+	if err := stml.Select(&subjectDTOs, parameters); err != nil {
+		return nil, fmt.Errorf("failed to execute statement: %w", err)
 	}
 
 	subjects := make([]*model.Subject, len(subjectDTOs))
