@@ -113,7 +113,7 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(title string, faculty strin
 		parameters["faculty"] = "%" + faculty + "%"
 
 	}
-	// Only perfevt matching is used for academic field
+	// Only perfect matching is used for academic field
 	if academicField != "" {
 		if searchQuery != "" {
 			searchQuery += " AND "
@@ -235,12 +235,14 @@ func (sR SubjectRepositoryImpl) getSubjectFromDto(subjectDTO dto.SubjectDTO) (*m
 
 // WARNING: This method become slower as the number of subjects increases due to LIMIT clause.
 // This also causes N+1 query problem.
-func (sR SubjectRepositoryImpl) GetByRandom(numSubjects int) ([]*model.Subject, error) {
+func (sR SubjectRepositoryImpl) GetByRandom(series string, academicField string, numSubjects int) ([]*model.Subject, error) {
+	// get subjects with at least one video
 	sql := `
+
 		SELECT
 			subjects.id,
 			category,
-			title,
+			subjects.title,
 			location,
 			department,
 			first_held_on,
@@ -249,15 +251,45 @@ func (sR SubjectRepositoryImpl) GetByRandom(numSubjects int) ([]*model.Subject, 
 			free_description,
 			series,
 			academic_field,
-			syllabuses.id AS syllabus_id,
+			syllabuses.id,
 			thumbnail_link
 		FROM subjects
 		LEFT JOIN syllabuses
 		ON subjects.id = syllabuses.subject_id
-		ORDER BY RAND() LIMIT ?
+		RIGHT JOIN videos
+		ON subjects.id = videos.subject_id
+		GROUP BY subjects.id
 	`
+
+	searchQuery := ""
+	parameters := map[string]interface{}{}
+
+	if series != "" {
+		searchQuery += "series = " + ":series"
+		parameters["series"] = series
+	}
+
+	if academicField != "" {
+		if searchQuery != "" {
+			searchQuery += " AND "
+		}
+		searchQuery += "academic_field = " + ":academic_field"
+		parameters["academic_field"] = academicField
+	}
+
+	if searchQuery != "" {
+		searchQuery += " AND "
+	}
+	searchQuery += "ORDER BY RAND() LIMIT " + ":num_subjects"
+	parameters["num_subjects"] = numSubjects
+
+	if searchQuery != "" {
+		searchQuery = "WHERE " + searchQuery
+	}
+	sql += searchQuery
+
 	subjectDTOs := []dto.SubjectDTO{}
-	if err := sR.db.Select(&subjectDTOs, sql, numSubjects); err != nil {
+	if err := sR.db.Select(&subjectDTOs, sql, parameters); err != nil {
 		return nil, fmt.Errorf("failed to select `subjects` table : %w", err)
 	}
 
