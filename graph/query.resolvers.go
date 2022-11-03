@@ -54,8 +54,8 @@ func (r *queryResolver) AcademicFields(ctx context.Context) ([]*model.AcademicFi
 }
 
 // RandomSubjects is the resolver for the randomSubjects field.
-func (r *queryResolver) RandomSubjects(ctx context.Context) ([]*model.Subject, error) {
-	subjects, err := r.sbU.GetByRandom()
+func (r *queryResolver) RandomSubjects(ctx context.Context, series string, academicField string, numSubjects int) ([]*model.Subject, error) {
+	subjects, err := r.sbU.GetByRandom(series, academicField, numSubjects)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByRandom` func of SubjectUsecase: %w", err)
 	}
