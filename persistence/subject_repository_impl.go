@@ -100,7 +100,7 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(title string, faculty strin
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "title LIKE " + ":title"
+		searchQuery += "title LIKE:title"
 		parameters["title"] = "%" + title + "%"
 
 	}
@@ -109,7 +109,7 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(title string, faculty strin
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "subjects.faculty LIKE " + ":faculty"
+		searchQuery += "subjects.faculty LIKE :faculty"
 		parameters["faculty"] = "%" + faculty + "%"
 
 	}
@@ -118,7 +118,7 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(title string, faculty strin
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "academic_field = " + ":academic_field"
+		searchQuery += "academic_field = :academic_field"
 		parameters["academic_field"] = academicField
 
 	}
@@ -272,7 +272,7 @@ func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, acad
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "series = " + ":series"
+		searchQuery += "series = :series"
 		parameters["series"] = series
 	}
 
@@ -280,7 +280,7 @@ func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, acad
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "academic_field = " + ":academicField"
+		searchQuery += "academic_field = :academicField"
 		parameters["academicField"] = academicField
 	}
 
@@ -289,7 +289,7 @@ func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, acad
 	}
 
 	searchQuery += " GROUP BY subjects.id "
-	searchQuery += "ORDER BY RAND() LIMIT " + ":numSubjects"
+	searchQuery += "ORDER BY RAND() LIMIT :numSubjects"
 	parameters["numSubjects"] = numSubjects
 
 	sql += searchQuery
