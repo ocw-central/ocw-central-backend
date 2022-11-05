@@ -235,10 +235,10 @@ func (sR SubjectRepositoryImpl) getSubjectFromDto(subjectDTO dto.SubjectDTO) (*m
 
 // WARNING: This method become slower as the number of subjects increases due to LIMIT clause.
 // This also causes N+1 query problem.
-func (sR SubjectRepositoryImpl) GetByRandom(series string, academicField string, numSubjects int) ([]*model.Subject, error) {
+func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, academicField string, numSubjects int) ([]*model.Subject, error) {
+	subjectDTOs := make([]dto.SubjectDTO, 0)
 	// get subjects with at least one video
 	sql := `
-
 		SELECT
 			subjects.id,
 			category,
@@ -251,7 +251,7 @@ func (sR SubjectRepositoryImpl) GetByRandom(series string, academicField string,
 			free_description,
 			series,
 			academic_field,
-			syllabuses.id,
+			syllabuses.id as syllabus_id,
 			thumbnail_link
 		FROM subjects
 		LEFT JOIN syllabuses
@@ -263,7 +263,15 @@ func (sR SubjectRepositoryImpl) GetByRandom(series string, academicField string,
 	searchQuery := ""
 	parameters := map[string]interface{}{}
 
+	if category != "" {
+		searchQuery += " AND category = :category"
+		parameters["category"] = category
+	}
+
 	if series != "" {
+		if searchQuery != "" {
+			searchQuery += " AND "
+		}
 		searchQuery += "series = " + ":series"
 		parameters["series"] = series
 	}
@@ -285,25 +293,21 @@ func (sR SubjectRepositoryImpl) GetByRandom(series string, academicField string,
 	parameters["numSubjects"] = numSubjects
 
 	sql += searchQuery
-	// print
-	fmt.Println(sql)
 	stml, err := sR.db.PrepareNamed(sql)
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare sql: %w", err)
 	}
 
-	subjectDTOs := []dto.SubjectDTO{}
 	if err := stml.Select(&subjectDTOs, parameters); err != nil {
 		return nil, fmt.Errorf("failed to execute statement: %w", err)
 	}
-
-	subjects := make([]*model.Subject, len(subjectDTOs))
-	for i, subjectDTO := range subjectDTOs {
+	subjects := make([]*model.Subject, 0)
+	for _, subjectDTO := range subjectDTOs {
 		subject, err := sR.getSubjectFromDto(subjectDTO)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert `subjectDTO` to `subject`: %w", err)
 		}
-		subjects[i] = subject
+		subjects = append(subjects, subject)
 	}
 	return subjects, nil
 }
