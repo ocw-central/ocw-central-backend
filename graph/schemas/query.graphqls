@@ -2,6 +2,6 @@ type Query {
   subject(id: ID!): Subject!
   subjects(title: String!, faculty: String!, academicField: String!): [Subject!]!
   academicFields: [AcademicField!]!
-  randomSubjects(series: String!, academicField: String!, numSubjects: Int!): [Subject!]!
+  randomSubjects(category: String!, series: String!, academicField: String!, numSubjects: Int!): [Subject!]!
   subjectsWithSpecifiedVideos(title: String!, faculty: String!): [SubjectWithSpecifiedVideos!]!
 }

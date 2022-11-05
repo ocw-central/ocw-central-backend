@@ -81,14 +81,14 @@ func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, a
 	return subjectDTOs, nil
 }
 
-func (sI SubjectInteractor) GetByRandom(series string, academicField string, numRandomSubjects int) ([]*dto.SubjectDTO, error) {
+func (sI SubjectInteractor) GetByRandom(category string, series string, academicField string, numRandomSubjects int) ([]*dto.SubjectDTO, error) {
 	if cache, found := sI.randomSubjectCache.Get("random-subjects"); found {
 		if subjects, ok := cache.([]*dto.SubjectDTO); ok {
 			return subjects, nil
 		}
 	}
 
-	subjects, err := sI.sR.GetByRandom(series, academicField, numRandomSubjects)
+	subjects, err := sI.sR.GetByRandom(category, series, academicField, numRandomSubjects)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByRandom` of SubjectRepository: %w", err)
 	}
