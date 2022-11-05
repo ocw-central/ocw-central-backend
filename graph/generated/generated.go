@@ -59,7 +59,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		AcademicFields              func(childComplexity int) int
-		RandomSubjects              func(childComplexity int, series string, academicField string, numSubjects int) int
+		RandomSubjects              func(childComplexity int, category string, series string, academicField string, numSubjects int) int
 		Subject                     func(childComplexity int, id string) int
 		Subjects                    func(childComplexity int, title string, faculty string, academicField string) int
 		SubjectsWithSpecifiedVideos func(childComplexity int, title string, faculty string) int
@@ -162,7 +162,7 @@ type QueryResolver interface {
 	Subject(ctx context.Context, id string) (*model.Subject, error)
 	Subjects(ctx context.Context, title string, faculty string, academicField string) ([]*model.Subject, error)
 	AcademicFields(ctx context.Context) ([]*model.AcademicField, error)
-	RandomSubjects(ctx context.Context, series string, academicField string, numSubjects int) ([]*model.Subject, error)
+	RandomSubjects(ctx context.Context, category string, series string, academicField string, numSubjects int) ([]*model.Subject, error)
 	SubjectsWithSpecifiedVideos(ctx context.Context, title string, faculty string) ([]*model.SubjectWithSpecifiedVideos, error)
 }
 type SubjectResolver interface {
@@ -241,7 +241,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.RandomSubjects(childComplexity, args["series"].(string), args["academicField"].(string), args["numSubjects"].(int)), true
+		return e.complexity.Query.RandomSubjects(childComplexity, args["category"].(string), args["series"].(string), args["academicField"].(string), args["numSubjects"].(int)), true
 
 	case "Query.subject":
 		if e.complexity.Query.Subject == nil {
@@ -849,7 +849,7 @@ var sources = []*ast.Source{
   subject(id: ID!): Subject!
   subjects(title: String!, faculty: String!, academicField: String!): [Subject!]!
   academicFields: [AcademicField!]!
-  randomSubjects(series: String!, academicField: String!, numSubjects: Int!): [Subject!]!
+  randomSubjects(category: String!, series: String!, academicField: String!, numSubjects: Int!): [Subject!]!
   subjectsWithSpecifiedVideos(title: String!, faculty: String!): [SubjectWithSpecifiedVideos!]!
 }
 `, BuiltIn: false},
@@ -974,32 +974,41 @@ func (ec *executionContext) field_Query_randomSubjects_args(ctx context.Context,
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["series"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("series"))
+	if tmp, ok := rawArgs["category"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["series"] = arg0
+	args["category"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["academicField"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("academicField"))
+	if tmp, ok := rawArgs["series"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("series"))
 		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["academicField"] = arg1
-	var arg2 int
-	if tmp, ok := rawArgs["numSubjects"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("numSubjects"))
-		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+	args["series"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["academicField"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("academicField"))
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["numSubjects"] = arg2
+	args["academicField"] = arg2
+	var arg3 int
+	if tmp, ok := rawArgs["numSubjects"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("numSubjects"))
+		arg3, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["numSubjects"] = arg3
 	return args, nil
 }
 
@@ -1573,7 +1582,7 @@ func (ec *executionContext) _Query_randomSubjects(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().RandomSubjects(rctx, fc.Args["series"].(string), fc.Args["academicField"].(string), fc.Args["numSubjects"].(int))
+		return ec.resolvers.Query().RandomSubjects(rctx, fc.Args["category"].(string), fc.Args["series"].(string), fc.Args["academicField"].(string), fc.Args["numSubjects"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
