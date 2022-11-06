@@ -82,7 +82,8 @@ func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, a
 }
 
 func (sI SubjectInteractor) GetByRandom(category string, series string, academicField string, numRandomSubjects int) ([]*dto.SubjectDTO, error) {
-	if cache, found := sI.randomSubjectCache.Get("random-subjects"); found {
+	keyString := fmt.Sprintf("random-subjects-%s-%s-%s-%d", category, series, academicField, numRandomSubjects)
+	if cache, found := sI.randomSubjectCache.Get(keyString); found {
 		if subjects, ok := cache.([]*dto.SubjectDTO); ok {
 			return subjects, nil
 		}
@@ -98,7 +99,7 @@ func (sI SubjectInteractor) GetByRandom(category string, series string, academic
 		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
 
-	sI.randomSubjectCache.Set("random-subjects", subjectDTOs, cache.DefaultExpiration)
+	sI.randomSubjectCache.Set(keyString, subjectDTOs, cache.DefaultExpiration)
 	return subjectDTOs, nil
 }
 
