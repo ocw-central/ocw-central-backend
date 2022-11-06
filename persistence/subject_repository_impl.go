@@ -264,7 +264,7 @@ func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, acad
 	parameters := map[string]interface{}{}
 
 	if category != "" {
-		searchQuery += " AND category = :category"
+		searchQuery += "category = :category"
 		parameters["category"] = category
 	}
 
