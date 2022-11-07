@@ -4,6 +4,7 @@
 
 [![golangci-lint](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
+[![Gitter](https://badges.gitter.im/ocw-central/community.svg)](https://gitter.im/ocw-central/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## How to start this app
 

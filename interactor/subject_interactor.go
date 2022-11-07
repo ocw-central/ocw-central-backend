@@ -12,8 +12,6 @@ import (
 )
 
 const (
-	numRandomSubjects = 12
-
 	// this value is used for GetByRandom() cache
 	cacheDefaultExpiration = 2 * time.Hour
 	cacheCleanupInterval   = 24 * time.Hour
@@ -83,14 +81,15 @@ func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, a
 	return subjectDTOs, nil
 }
 
-func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
-	if cache, found := sI.randomSubjectCache.Get("random-subjects"); found {
+func (sI SubjectInteractor) GetByRandom(category string, series string, academicField string, numRandomSubjects int) ([]*dto.SubjectDTO, error) {
+	keyString := fmt.Sprintf("random-subjects-%s-%s-%s-%d", category, series, academicField, numRandomSubjects)
+	if cache, found := sI.randomSubjectCache.Get(keyString); found {
 		if subjects, ok := cache.([]*dto.SubjectDTO); ok {
 			return subjects, nil
 		}
 	}
 
-	subjects, err := sI.sR.GetByRandom(numRandomSubjects)
+	subjects, err := sI.sR.GetByRandom(category, series, academicField, numRandomSubjects)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByRandom` of SubjectRepository: %w", err)
 	}
@@ -100,7 +99,7 @@ func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
 		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
 
-	sI.randomSubjectCache.Set("random-subjects", subjectDTOs, cache.DefaultExpiration)
+	sI.randomSubjectCache.Set(keyString, subjectDTOs, cache.DefaultExpiration)
 	return subjectDTOs, nil
 }
 

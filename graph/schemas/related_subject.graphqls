@@ -7,7 +7,7 @@ type RelatedSubject implements Node {
   resourceIds: [ID!]!
   relatedSubjectIds: [ID!]!
   department: String!
-  firstHeldOn: Time!
+  firstHeldOn: Time
   faculty: String!
   language: String!
   freeDescription: String!

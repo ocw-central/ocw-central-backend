@@ -59,7 +59,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		AcademicFields              func(childComplexity int) int
-		RandomSubjects              func(childComplexity int) int
+		RandomSubjects              func(childComplexity int, category string, series string, academicField string, numSubjects int) int
 		Subject                     func(childComplexity int, id string) int
 		Subjects                    func(childComplexity int, title string, faculty string, academicField string) int
 		SubjectsWithSpecifiedVideos func(childComplexity int, title string, faculty string) int
@@ -162,7 +162,7 @@ type QueryResolver interface {
 	Subject(ctx context.Context, id string) (*model.Subject, error)
 	Subjects(ctx context.Context, title string, faculty string, academicField string) ([]*model.Subject, error)
 	AcademicFields(ctx context.Context) ([]*model.AcademicField, error)
-	RandomSubjects(ctx context.Context) ([]*model.Subject, error)
+	RandomSubjects(ctx context.Context, category string, series string, academicField string, numSubjects int) ([]*model.Subject, error)
 	SubjectsWithSpecifiedVideos(ctx context.Context, title string, faculty string) ([]*model.SubjectWithSpecifiedVideos, error)
 }
 type SubjectResolver interface {
@@ -236,7 +236,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.RandomSubjects(childComplexity), true
+		args, err := ec.field_Query_randomSubjects_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.RandomSubjects(childComplexity, args["category"].(string), args["series"].(string), args["academicField"].(string), args["numSubjects"].(int)), true
 
 	case "Query.subject":
 		if e.complexity.Query.Subject == nil {
@@ -844,7 +849,7 @@ var sources = []*ast.Source{
   subject(id: ID!): Subject!
   subjects(title: String!, faculty: String!, academicField: String!): [Subject!]!
   academicFields: [AcademicField!]!
-  randomSubjects: [Subject!]!
+  randomSubjects(category: String!, series: String!, academicField: String!, numSubjects: Int!): [Subject!]!
   subjectsWithSpecifiedVideos(title: String!, faculty: String!): [SubjectWithSpecifiedVideos!]!
 }
 `, BuiltIn: false},
@@ -857,7 +862,7 @@ var sources = []*ast.Source{
   resourceIds: [ID!]!
   relatedSubjectIds: [ID!]!
   department: String!
-  firstHeldOn: Time!
+  firstHeldOn: Time
   faculty: String!
   language: String!
   freeDescription: String!
@@ -937,7 +942,7 @@ scalar Time
   link: String!
   chapters: [Chapter!]!
   faculty: String!
-  lecturedOn: Time!
+  lecturedOn: Time
   videoLength: Int!
   language: String!
   transcription: String!
@@ -962,6 +967,48 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_randomSubjects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["category"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["category"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["series"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("series"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["series"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["academicField"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("academicField"))
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["academicField"] = arg2
+	var arg3 int
+	if tmp, ok := rawArgs["numSubjects"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("numSubjects"))
+		arg3, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["numSubjects"] = arg3
 	return args, nil
 }
 
@@ -1535,7 +1582,7 @@ func (ec *executionContext) _Query_randomSubjects(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().RandomSubjects(rctx)
+		return ec.resolvers.Query().RandomSubjects(rctx, fc.Args["category"].(string), fc.Args["series"].(string), fc.Args["academicField"].(string), fc.Args["numSubjects"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1595,6 +1642,17 @@ func (ec *executionContext) fieldContext_Query_randomSubjects(ctx context.Contex
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Subject", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_randomSubjects_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -2162,14 +2220,11 @@ func (ec *executionContext) _RelatedSubject_firstHeldOn(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_RelatedSubject_firstHeldOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4934,14 +4989,11 @@ func (ec *executionContext) _Video_lecturedOn(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Video_lecturedOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7232,9 +7284,6 @@ func (ec *executionContext) _RelatedSubject(ctx context.Context, sel ast.Selecti
 
 			out.Values[i] = ec._RelatedSubject_firstHeldOn(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "faculty":
 
 			out.Values[i] = ec._RelatedSubject_faculty(ctx, field, obj)
@@ -7817,9 +7866,6 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Values[i] = ec._Video_lecturedOn(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "videoLength":
 
 			out.Values[i] = ec._Video_videoLength(ctx, field, obj)
@@ -8660,21 +8706,6 @@ func (ec *executionContext) marshalNSubpage2ᚕgithubᚗcomᚋkafugenᚋocwcentr
 	}
 
 	return ret
-}
-
-func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
-	res, err := graphql.UnmarshalTime(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
-	res := graphql.MarshalTime(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) marshalNVideo2githubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐVideo(ctx context.Context, sel ast.SelectionSet, v model.Video) graphql.Marshaler {
