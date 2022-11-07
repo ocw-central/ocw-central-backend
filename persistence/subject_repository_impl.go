@@ -100,7 +100,7 @@ func (sR SubjectRepositoryImpl) GetBySearchParameter(title string, faculty strin
 		if searchQuery != "" {
 			searchQuery += " AND "
 		}
-		searchQuery += "title LIKE:title"
+		searchQuery += "title LIKE :title"
 		parameters["title"] = "%" + title + "%"
 
 	}
@@ -235,7 +235,11 @@ func (sR SubjectRepositoryImpl) getSubjectFromDto(subjectDTO dto.SubjectDTO) (*m
 
 // WARNING: This method become slower as the number of subjects increases due to LIMIT clause.
 // This also causes N+1 query problem.
-func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, academicField string, numSubjects int) ([]*model.Subject, error) {
+func (sR SubjectRepositoryImpl) GetByRandom(
+	category string,
+	series string,
+	academicField string,
+	numSubjects int) ([]*model.Subject, error) {
 	subjectDTOs := make([]dto.SubjectDTO, 0)
 	// get subjects with at least one video
 	sql := `
@@ -251,7 +255,7 @@ func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, acad
 			free_description,
 			series,
 			academic_field,
-			syllabuses.id as syllabus_id,
+			syllabuses.id AS syllabus_id,
 			thumbnail_link
 		FROM subjects
 		LEFT JOIN syllabuses
@@ -285,11 +289,11 @@ func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, acad
 	}
 
 	if searchQuery != "" {
-		searchQuery = "WHERE " + searchQuery
+		searchQuery = " WHERE " + searchQuery
 	}
 
-	searchQuery += " GROUP BY subjects.id "
-	searchQuery += "ORDER BY RAND() LIMIT :numSubjects"
+	searchQuery += " GROUP BY subjects.id, syllabuses.id "
+	searchQuery += " ORDER BY RAND() LIMIT :numSubjects "
 	parameters["numSubjects"] = numSubjects
 
 	sql += searchQuery
@@ -301,13 +305,13 @@ func (sR SubjectRepositoryImpl) GetByRandom(category string, series string, acad
 	if err := stml.Select(&subjectDTOs, parameters); err != nil {
 		return nil, fmt.Errorf("failed to execute statement: %w", err)
 	}
-	subjects := make([]*model.Subject, 0)
-	for _, subjectDTO := range subjectDTOs {
+	subjects := make([]*model.Subject, numSubjects)
+	for i, subjectDTO := range subjectDTOs {
 		subject, err := sR.getSubjectFromDto(subjectDTO)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert `subjectDTO` to `subject`: %w", err)
 		}
-		subjects = append(subjects, subject)
+		subjects[i] = subject
 	}
 	return subjects, nil
 }
