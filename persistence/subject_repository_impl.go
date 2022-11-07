@@ -297,12 +297,12 @@ func (sR SubjectRepositoryImpl) GetByRandom(
 	parameters["numSubjects"] = numSubjects
 
 	sql += searchQuery
-	stml, err := sR.db.PrepareNamed(sql)
+	stmt, err := sR.db.PrepareNamed(sql)
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare sql: %w", err)
 	}
 
-	if err := stml.Select(&subjectDTOs, parameters); err != nil {
+	if err := stmt.Select(&subjectDTOs, parameters); err != nil {
 		return nil, fmt.Errorf("failed to execute statement: %w", err)
 	}
 	subjects := make([]*model.Subject, numSubjects)
