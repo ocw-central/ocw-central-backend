@@ -4,6 +4,7 @@
 
 [![golangci-lint](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/ocw-central/ocw-central-backend/actions/workflows/golangci-lint.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
+[![Gitter](https://badges.gitter.im/ocw-central/community.svg)](https://gitter.im/ocw-central/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## How to start this app
 
@@ -24,9 +25,9 @@
     ```
     docker-compose up --build
     ```
-3. You need to import data into the database for the first time. (**The mock data will be available soon.**) You can do it by running the following command.
+3. You need to import data into the database at the first time. The mock data is available [here](./mock_data.md). You can import it by running the following command.
     ```
-    mysql ocw-central < /path/to/dump/file.sql -p　<MYSQL_PASSWORD>
+    mysql -p　<MYSQL_PASSWORD> -h 127.0.0.1 ocw-central < /path/to/dump/file.sql
     ```
 4. Access to [localhost:8080](localhost:8080) and you can see the app.
 

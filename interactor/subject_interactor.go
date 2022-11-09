@@ -12,8 +12,6 @@ import (
 )
 
 const (
-	numRandomSubjects = 12
-
 	// this value is used for GetByRandom() cache
 	cacheDefaultExpiration = 2 * time.Hour
 	cacheCleanupInterval   = 24 * time.Hour
@@ -21,12 +19,14 @@ const (
 
 type SubjectInteractor struct {
 	sR                 repository.SubjectRepository
+	vR                 repository.VideoRepository
 	randomSubjectCache *cache.Cache
 }
 
-func NewSubjectInteractor(sR repository.SubjectRepository) *SubjectInteractor {
+func NewSubjectInteractor(sR repository.SubjectRepository, vR repository.VideoRepository) *SubjectInteractor {
 	return &SubjectInteractor{
 		sR:                 sR,
+		vR:                 vR,
 		randomSubjectCache: cache.New(cacheDefaultExpiration, cacheCleanupInterval),
 	}
 }
@@ -81,14 +81,15 @@ func (sI SubjectInteractor) GetBySearchParameter(title string, faculty string, a
 	return subjectDTOs, nil
 }
 
-func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
-	if cache, found := sI.randomSubjectCache.Get("random-subjects"); found {
+func (sI SubjectInteractor) GetByRandom(category string, series string, academicField string, numRandomSubjects int) ([]*dto.SubjectDTO, error) {
+	keyString := fmt.Sprintf("random-subjects-%s-%s-%s-%d", category, series, academicField, numRandomSubjects)
+	if cache, found := sI.randomSubjectCache.Get(keyString); found {
 		if subjects, ok := cache.([]*dto.SubjectDTO); ok {
 			return subjects, nil
 		}
 	}
 
-	subjects, err := sI.sR.GetByRandom(numRandomSubjects)
+	subjects, err := sI.sR.GetByRandom(category, series, academicField, numRandomSubjects)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByRandom` of SubjectRepository: %w", err)
 	}
@@ -98,6 +99,39 @@ func (sI SubjectInteractor) GetByRandom() ([]*dto.SubjectDTO, error) {
 		subjectDTOs[i] = dto.NewSubjectDTO(subject)
 	}
 
-	sI.randomSubjectCache.Set("random-subjects", subjectDTOs, cache.DefaultExpiration)
+	sI.randomSubjectCache.Set(keyString, subjectDTOs, cache.DefaultExpiration)
 	return subjectDTOs, nil
+}
+
+func (sI SubjectInteractor) GetByVideoSearchParameter(title string, faculty string) ([]*dto.SubjectWithSpecifiedVideosDTO, error) {
+	videos, err := sI.vR.GetBySearchParameter(title, faculty)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetBySearchParameter` of VideoRepository: %w", err)
+	}
+
+	m := map[string]*model.Video{}
+	videoIds := make([]model.VideoId, len(videos))
+	for _, video := range videos {
+		m[video.Id().String()] = video
+		videoIds = append(videoIds, video.Id())
+	}
+
+	subjects, err := sI.sR.GetByVideoIds(videoIds)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByVideoIds` of SubjectRepository: %w", err)
+	}
+
+	subjectWithSpecifiedVideosDTOs := make([]*dto.SubjectWithSpecifiedVideosDTO, len(subjects))
+	for i, subject := range subjects {
+		videos := make([]*model.Video, 0, 20)
+		for _, videoId := range subject.VideoIds() {
+			_, ok := m[videoId.String()]
+			if ok {
+				videos = append(videos, m[videoId.String()])
+			}
+		}
+		subjectWithSpecifiedVideosDTOs[i] = dto.NewSubjectWithSpecifiedVideosDTO(subject, videos)
+	}
+
+	return subjectWithSpecifiedVideosDTOs, nil
 }

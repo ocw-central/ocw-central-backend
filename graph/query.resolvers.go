@@ -54,8 +54,8 @@ func (r *queryResolver) AcademicFields(ctx context.Context) ([]*model.AcademicFi
 }
 
 // RandomSubjects is the resolver for the randomSubjects field.
-func (r *queryResolver) RandomSubjects(ctx context.Context) ([]*model.Subject, error) {
-	subjects, err := r.sbU.GetByRandom()
+func (r *queryResolver) RandomSubjects(ctx context.Context, category string, series string, academicField string, numSubjects int) ([]*model.Subject, error) {
+	subjects, err := r.sbU.GetByRandom(category, series, academicField, numSubjects)
 	if err != nil {
 		return nil, fmt.Errorf("failed on executing `GetByRandom` func of SubjectUsecase: %w", err)
 	}
@@ -66,6 +66,22 @@ func (r *queryResolver) RandomSubjects(ctx context.Context) ([]*model.Subject, e
 		ss[i] = &s
 	}
 	return ss, nil
+}
+
+// SubjectsWithSpecifiedVideos is the resolver for the subjectsWithSpecifiedVideos field.
+func (r *queryResolver) SubjectsWithSpecifiedVideos(ctx context.Context, title string, faculty string) ([]*model.SubjectWithSpecifiedVideos, error) {
+	if title == "" && faculty == "" {
+		return nil, fmt.Errorf("at least one of the parameters must be specified")
+	}
+	subjectWithSpecifiedVideoDTOs, err := r.sbU.GetByVideoSearchParameter(title, faculty)
+	if err != nil {
+		return nil, fmt.Errorf("failed on executing `GetByVideoSearchParameter` func of SubjectUsecase: %w", err)
+	}
+	svs := make([]*model.SubjectWithSpecifiedVideos, len(subjectWithSpecifiedVideoDTOs))
+	for i, sv := range subjectWithSpecifiedVideoDTOs {
+		svs[i] = model.NewSubjectWithSpecifiedVideos(sv)
+	}
+	return svs, nil
 }
 
 // Query returns generated.QueryResolver implementation.

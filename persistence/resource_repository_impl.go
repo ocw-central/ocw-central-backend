@@ -23,7 +23,7 @@ func (vR *ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Res
 		return nil, nil
 	}
 
-	resourceIdBytes := make([]interface{}, len(ids))
+	resourceIdBytes := make([][]byte, len(ids))
 	for i, id := range ids {
 		resourceIdBytes[i] = id.ByteSlice()
 	}
@@ -36,12 +36,16 @@ func (vR *ResourceRepositoryImpl) GetByIds(ids []model.ResourceId) ([]*model.Res
 			ordering,
 			link
 		FROM resources
-		WHERE resources.id IN (` + utils.GetQuestionMarkStrs(len(ids)) + `)
+		WHERE resources.id IN (?)
 		ORDER BY ordering
 	`
+	query, args, err := sqlx.In(resourceSQL, resourceIdBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed on expand `In` statement: %w", err)
+	}
 
 	var resourceDTOs []dto.ResourceDTO
-	if err := vR.db.Select(&resourceDTOs, resourceSQL, resourceIdBytes...); err != nil {
+	if err := vR.db.Select(&resourceDTOs, query, args...); err != nil {
 		return nil, fmt.Errorf("failed on select to `resources` table: %w", err)
 	}
 
