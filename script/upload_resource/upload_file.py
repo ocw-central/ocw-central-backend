@@ -1,5 +1,5 @@
 import tempfile
-from typing import List
+from typing import List, Tuple
 
 import requests
 
@@ -8,7 +8,7 @@ from googleapiclient.http import MediaFileUpload
 from service import get_service
 
 
-def upload_file_from_links(links: List[str], file_name: str) -> str:
+def upload_file_from_link(link: List[str], file_name: str) -> str:
     response = requests.get(link)
     fp = tempfile.NamedTemporaryFile()
     fp.write(response.content)
@@ -18,16 +18,18 @@ def upload_file_from_links(links: List[str], file_name: str) -> str:
     return shared_link
 
 
-def upload_file(path: str, file_name: str) -> str:
+def upload_file(path: str, file_name: str) -> Tuple[str, str]:
     service = get_service()
     file_metadata = {'name': file_name}
     media = MediaFileUpload(path)
     file = service.files() \
-        .create(body=file_metadata, media_body=media, fields='id') \
+        .create(body=file_metadata, media_body=media, fields='id,webViewLink') \
         .execute()
 
-    file = service.permissions() \
+    web_view_link = file["webViewLink"]
+
+    service.permissions() \
         .create(fileId=file["id"], body={'type': 'anyone', 'role': 'reader'}) \
         .execute()
 
-    return file["webViewLink"]
+    return web_view_link, file["id"]
