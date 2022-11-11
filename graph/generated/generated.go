@@ -144,6 +144,12 @@ type ComplexityRoot struct {
 		TargetedAudience  func(childComplexity int) int
 	}
 
+	Translation struct {
+		ID           func(childComplexity int) int
+		LanguageCode func(childComplexity int) int
+		Translation  func(childComplexity int) int
+	}
+
 	Video struct {
 		Chapters      func(childComplexity int) int
 		Faculty       func(childComplexity int) int
@@ -154,6 +160,7 @@ type ComplexityRoot struct {
 		Ordering      func(childComplexity int) int
 		Title         func(childComplexity int) int
 		Transcription func(childComplexity int) int
+		Translations  func(childComplexity int) int
 		VideoLength   func(childComplexity int) int
 	}
 }
@@ -706,6 +713,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Syllabus.TargetedAudience(childComplexity), true
 
+	case "Translation.id":
+		if e.complexity.Translation.ID == nil {
+			break
+		}
+
+		return e.complexity.Translation.ID(childComplexity), true
+
+	case "Translation.languageCode":
+		if e.complexity.Translation.LanguageCode == nil {
+			break
+		}
+
+		return e.complexity.Translation.LanguageCode(childComplexity), true
+
+	case "Translation.translation":
+		if e.complexity.Translation.Translation == nil {
+			break
+		}
+
+		return e.complexity.Translation.Translation(childComplexity), true
+
 	case "Video.chapters":
 		if e.complexity.Video.Chapters == nil {
 			break
@@ -768,6 +796,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Video.Transcription(childComplexity), true
+
+	case "Video.translations":
+		if e.complexity.Video.Translations == nil {
+			break
+		}
+
+		return e.complexity.Video.Translations(childComplexity), true
 
 	case "Video.videoLength":
 		if e.complexity.Video.VideoLength == nil {
@@ -935,6 +970,12 @@ scalar Time
   subpages: [Subpage!]!
 }
 `, BuiltIn: false},
+	{Name: "../schemas/translation.graphqls", Input: `type Translation implements Node {
+  id: ID!
+  languageCode: String!
+  translation: String!
+}
+`, BuiltIn: false},
 	{Name: "../schemas/video.graphqls", Input: `type Video implements Node {
   id: ID!
   title: String!
@@ -946,6 +987,7 @@ scalar Time
   videoLength: Int!
   language: String!
   transcription: String!
+  translations: [Translation]!
 }
 `, BuiltIn: false},
 }
@@ -2959,6 +3001,8 @@ func (ec *executionContext) fieldContext_Subject_videos(ctx context.Context, fie
 				return ec.fieldContext_Video_language(ctx, field)
 			case "transcription":
 				return ec.fieldContext_Video_transcription(ctx, field)
+			case "translations":
+				return ec.fieldContext_Video_translations(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Video", field.Name)
 		},
@@ -3713,6 +3757,8 @@ func (ec *executionContext) fieldContext_SubjectWithSpecifiedVideos_videos(ctx c
 				return ec.fieldContext_Video_language(ctx, field)
 			case "transcription":
 				return ec.fieldContext_Video_transcription(ctx, field)
+			case "translations":
+				return ec.fieldContext_Video_translations(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Video", field.Name)
 		},
@@ -4694,6 +4740,138 @@ func (ec *executionContext) fieldContext_Syllabus_subpages(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Translation_id(ctx context.Context, field graphql.CollectedField, obj *model.Translation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Translation_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Translation_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Translation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Translation_languageCode(ctx context.Context, field graphql.CollectedField, obj *model.Translation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Translation_languageCode(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LanguageCode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Translation_languageCode(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Translation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Translation_translation(ctx context.Context, field graphql.CollectedField, obj *model.Translation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Translation_translation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Translation, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Translation_translation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Translation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Video_id(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Video_id(ctx, field)
 	if err != nil {
@@ -5136,6 +5314,58 @@ func (ec *executionContext) fieldContext_Video_transcription(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Video_translations(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Video_translations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Translations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]model.Translation)
+	fc.Result = res
+	return ec.marshalNTranslation2ᚕgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐTranslation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Video_translations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Video",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Translation_id(ctx, field)
+			case "languageCode":
+				return ec.fieldContext_Translation_languageCode(ctx, field)
+			case "translation":
+				return ec.fieldContext_Translation_translation(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Translation", field.Name)
 		},
 	}
 	return fc, nil
@@ -6964,6 +7194,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Syllabus(ctx, sel, obj)
+	case model.Translation:
+		return ec._Translation(ctx, sel, &obj)
+	case *model.Translation:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Translation(ctx, sel, obj)
 	case model.Video:
 		return ec._Video(ctx, sel, &obj)
 	case *model.Video:
@@ -7810,6 +8047,48 @@ func (ec *executionContext) _Syllabus(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
+var translationImplementors = []string{"Translation", "Node"}
+
+func (ec *executionContext) _Translation(ctx context.Context, sel ast.SelectionSet, obj *model.Translation) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, translationImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Translation")
+		case "id":
+
+			out.Values[i] = ec._Translation_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "languageCode":
+
+			out.Values[i] = ec._Translation_languageCode(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "translation":
+
+			out.Values[i] = ec._Translation_translation(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var videoImplementors = []string{"Video", "Node"}
 
 func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, obj *model.Video) graphql.Marshaler {
@@ -7883,6 +8162,13 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 		case "transcription":
 
 			out.Values[i] = ec._Video_transcription(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "translations":
+
+			out.Values[i] = ec._Video_translations(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -8708,6 +8994,44 @@ func (ec *executionContext) marshalNSubpage2ᚕgithubᚗcomᚋkafugenᚋocwcentr
 	return ret
 }
 
+func (ec *executionContext) marshalNTranslation2ᚕgithubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐTranslation(ctx context.Context, sel ast.SelectionSet, v []model.Translation) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTranslation2githubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐTranslation(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
 func (ec *executionContext) marshalNVideo2githubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐVideo(ctx context.Context, sel ast.SelectionSet, v model.Video) graphql.Marshaler {
 	return ec._Video(ctx, sel, &v)
 }
@@ -9120,6 +9444,10 @@ func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v in
 func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
 	res := graphql.MarshalTime(v)
 	return res
+}
+
+func (ec *executionContext) marshalOTranslation2githubᚗcomᚋkafugenᚋocwcentralᚋgraphᚋmodelᚐTranslation(ctx context.Context, sel ast.SelectionSet, v model.Translation) graphql.Marshaler {
+	return ec._Translation(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

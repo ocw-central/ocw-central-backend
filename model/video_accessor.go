@@ -34,3 +34,6 @@ func (v *Video) Language() string {
 func (v *Video) Transcription() string {
 	return v.transcription
 }
+func (v *Video) Translations() []Translation {
+	return v.translations
+}
