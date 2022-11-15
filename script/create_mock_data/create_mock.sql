@@ -50,6 +50,17 @@ chapters.updated_at
 from `ocw-central`.chapters
 join videos on videos.id = chapters.video_id;
 
+insert into translations
+select
+translations.id,
+translations.video_id,
+translations.language_code,
+translations.translation,
+translations.created_at,
+translations.updated_at
+from `ocw-central`.translations
+join videos on videos.id = translations.video_id;
+
 insert into resources
 select
 resources.id,

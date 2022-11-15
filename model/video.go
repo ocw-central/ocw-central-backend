@@ -39,6 +39,7 @@ type Video struct {
 	videoLength   time.Duration `desc:"動画の長さ"`
 	language      string        `desc:"使用言語"`
 	transcription string        `desc:"書き起こし"`
+	translations  []Translation `desc:"書き起こしの翻訳"`
 }
 
 func NewVideoFromRepository(
@@ -52,6 +53,7 @@ func NewVideoFromRepository(
 	videoLength time.Duration,
 	language string,
 	transcription string,
+	translations []Translation,
 ) *Video {
 	return &Video{
 		id:            id,
@@ -64,5 +66,6 @@ func NewVideoFromRepository(
 		videoLength:   videoLength,
 		language:      language,
 		transcription: transcription,
+		translations:  translations,
 	}
 }
