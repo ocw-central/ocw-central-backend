@@ -8,4 +8,3 @@ RUN chmod +x /usr/local/bin/migrate.sh
 
 
 ENTRYPOINT [ "migrate.sh" ]
-
