@@ -64,7 +64,7 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
 	}
 
-	videos, err := getVideosFromDTOs(videoChapterDTOs)
+	videos, err := vR.getVideosFromDTOs(videoChapterDTOs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get videos from DTOs: %w", err)
 	}
@@ -74,7 +74,7 @@ func (vR *VideoRepositoryImpl) GetByIds(ids []model.VideoId) ([]*model.Video, er
 // getVideosFromDTOs returns videos from the given videoChapterDTOs.
 // videoChapterDTOs need not be sorted by id or ordering,
 // but chapters of the same video must be contiguous.
-func getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, error) {
+func (vR *VideoRepositoryImpl) getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, error) {
 	rowIndex := 0
 
 	// the number of video is expected to be smaller than 20,
@@ -86,6 +86,11 @@ func getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, 
 		chapters, err := getChapters(videoChapterDTOs[rowIndex:])
 		if err != nil {
 			return nil, fmt.Errorf("failed to get chapters (rowIndex: %v): %w", rowIndex, err)
+		}
+
+		translations, err := vR.getTranslations(videoChapterDTO.Id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get translations (rowIndex: %v): %w", rowIndex, err)
 		}
 
 		videoId, err := model.NewVideoId(*videoChapterDTO.Id)
@@ -104,6 +109,7 @@ func getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, 
 			time.Duration(*videoChapterDTO.VideoLength*int(time.Second)),
 			utils.ConvertNilToZeroValue(videoChapterDTO.Language),
 			utils.ConvertNilToZeroValue(videoChapterDTO.Transcription),
+			translations,
 		)
 		videos = append(videos, video)
 
@@ -114,6 +120,41 @@ func getVideosFromDTOs(videoChapterDTOs []dto.VideoChapterDTO) ([]*model.Video, 
 		}
 	}
 	return videos, nil
+}
+
+func (vR *VideoRepositoryImpl) getTranslations(videoId *[]byte) ([]model.Translation, error) {
+	sql := `
+		SELECT
+			id,
+			language_code,
+			translation
+		FROM translations
+		WHERE video_id = ?
+	`
+
+	var translationDTOs []dto.TranslationDTO
+	if err := vR.db.Select(&translationDTOs, sql, videoId); err != nil {
+		return nil, fmt.Errorf("failed on select to `translation` table: %w", err)
+	}
+
+	if len(translationDTOs) == 0 {
+		return nil, nil
+	}
+
+	tms := make([]model.Translation, len(translationDTOs))
+	for i, td := range translationDTOs {
+		translationId, err := model.NewTranslationId(*td.Id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create `translationId`: %w", err)
+		}
+
+		tms[i] = *model.NewTranslationFromRepository(
+			*translationId,
+			*td.LanguageCode,
+			*td.Translation,
+		)
+	}
+	return tms, nil
 }
 
 // getChapters returns chapters of the video with the given ordering.
@@ -198,7 +239,7 @@ func (vR *VideoRepositoryImpl) GetBySearchParameter(title string, faculty string
 		return nil, fmt.Errorf("failed on select to `videos` table: %w", err)
 	}
 
-	videos, err := getVideosFromDTOs(videoChapterDTOs)
+	videos, err := vR.getVideosFromDTOs(videoChapterDTOs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get videos from DTOs: %w", err)
 	}

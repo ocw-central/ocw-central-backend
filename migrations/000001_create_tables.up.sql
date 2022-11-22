@@ -100,4 +100,3 @@ CREATE TABLE IF NOT EXISTS subject_related_subjects(
 );
 
 COMMIT;
-

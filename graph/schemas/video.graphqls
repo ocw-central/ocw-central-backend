@@ -9,4 +9,5 @@ type Video implements Node {
   videoLength: Int!
   language: String!
   transcription: String!
+  translations: [Translation]!
 }

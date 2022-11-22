@@ -57,18 +57,24 @@ type Syllabus struct {
 func (Syllabus) IsNode()            {}
 func (this Syllabus) GetID() string { return this.ID }
 
+type Translation dto.TranslationDTO
+
+func (Translation) IsNode()            {}
+func (this Translation) GetID() string { return this.ID }
+
 // type Video dto.VideoDTO
 type Video struct {
-	ID            string    `json:"id"`
-	Ordering      int       `json:"ordering"`
-	Title         string    `json:"title"`
-	Link          string    `json:"link"`
-	Chapters      []Chapter `json:"chapters"`
-	Faculty       string    `json:"faculty"`
-	LecturedOn    time.Time `json:"lecturedOn"`
-	VideoLength   int       `json:"videoLength"`
-	Language      string    `json:"language"`
-	Transcription string    `json:"transcription"`
+	ID            string        `json:"id"`
+	Ordering      int           `json:"ordering"`
+	Title         string        `json:"title"`
+	Link          string        `json:"link"`
+	Chapters      []Chapter     `json:"chapters"`
+	Faculty       string        `json:"faculty"`
+	LecturedOn    time.Time     `json:"lecturedOn"`
+	VideoLength   int           `json:"videoLength"`
+	Language      string        `json:"language"`
+	Transcription string        `json:"transcription"`
+	Translations  []Translation `json:"translations"`
 }
 
 func (Video) IsNode()            {}
@@ -79,6 +85,12 @@ func NewVideo(videoDTO *dto.VideoDTO) *Video {
 	for i, chapter := range videoDTO.Chapters {
 		chapters[i] = Chapter(chapter)
 	}
+
+	translations := make([]Translation, len(videoDTO.Translations))
+	for i, translation := range videoDTO.Translations {
+		translations[i] = Translation(translation)
+	}
+
 	return &Video{
 		ID:            videoDTO.ID,
 		Ordering:      videoDTO.Ordering,
@@ -90,6 +102,7 @@ func NewVideo(videoDTO *dto.VideoDTO) *Video {
 		VideoLength:   videoDTO.VideoLength,
 		Language:      videoDTO.Language,
 		Transcription: videoDTO.Transcription,
+		Translations:  translations,
 	}
 }
 

@@ -1,0 +1,5 @@
+type Translation implements Node {
+  id: ID!
+  languageCode: String!
+  translation: String!
+}
