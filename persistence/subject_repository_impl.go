@@ -305,7 +305,7 @@ func (sR SubjectRepositoryImpl) GetByRandom(
 	if err := stmt.Select(&subjectDTOs, parameters); err != nil {
 		return nil, fmt.Errorf("failed to execute statement: %w", err)
 	}
-	subjects := make([]*model.Subject, numSubjects)
+	subjects := make([]*model.Subject, len(subjectDTOs))
 	for i, subjectDTO := range subjectDTOs {
 		subject, err := sR.getSubjectFromDto(subjectDTO)
 		if err != nil {
