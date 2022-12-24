@@ -28,3 +28,5 @@ docker/mysql/data
 private/
 .vscode/
 .DS_Store
+# This is the default location for DataGrip related files
+.idea
