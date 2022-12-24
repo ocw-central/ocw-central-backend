@@ -7,38 +7,23 @@ services:
       dockerfile: ./docker/server/Dockerfile
     depends_on:
       - db
-      - migrate
     ports:
       - 8080:8080
     volumes:
       - ./docker/server:/var/lib/server
+      - ./migrations:/migrations
     environment:
-      WAIT_HOSTS: db:3306
+      APP_ENV: ${APP_ENV}
       TZ: Asia/Tokyo
       PORT: 8080
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
       MYSQL_ADDR: db:3306
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ocw-central
-      APP_ENV: ${APP_ENV}
-  migrate:
-    build:
-      context: ./
-      dockerfile: ./docker/migrate/Dockerfile
-    depends_on:
-      - db
-    command: ["up"]
-    environment:
-      WAIT_HOSTS: db:3306
       MIGRATIONS_DIR: /migrations
-      MYSQL_HOST: db
-      MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ocw-central
-      APP_ENV: ${APP_ENV}
-    volumes:
-      - ./migrations:/migrations
+      WAIT_HOSTS: db:3306
   db:
     build:
       context: ./

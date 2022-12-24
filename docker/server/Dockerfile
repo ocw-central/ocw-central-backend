@@ -12,7 +12,7 @@ FROM alpine:3.15
 WORKDIR /app
 
 RUN wget -q -O - https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz \
-    && ln -s /app/migrate.linux-amd64 /usr/bin/migrate
+    && ln -s /app/migrate.linux-amd64 /migrate
 
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
 RUN chmod +x /wait
