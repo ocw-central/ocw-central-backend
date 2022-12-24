@@ -16,8 +16,6 @@ services:
       APP_ENV: ${APP_ENV}
       TZ: Asia/Tokyo
       PORT: 8080
-      MYSQL_HOST: db
-      MYSQL_PORT: 3306
       MYSQL_ADDR: db:3306
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
